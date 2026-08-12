@@ -1,0 +1,1367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boadman - stake coins on your own results</title>
+<meta name="description" content="Boadman is an 18+ competition platform for video game players. Stake coins in 1v1 challenges and tournaments. The result decides the pot, minus commission.">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* ==========================================================================
+   BOADMAN LANDING - DIRECTION THREE
+   Aesthetic family: broadcast timing board. Light-themed paper page carrying
+   bounded saturated colour panels. Honest label: this is native CSS, no
+   framework, no design system package, no external font, no CDN.
+
+   COLOUR IS A SEMANTIC STATE SYSTEM, NOT DECORATION.
+     acid  #DDF247  = spendable       (balance you can actually move)
+     flame #FF4A1C  = committed       (money at risk, in play, or deducted)
+     ultra #2436E0  = held            (frozen: in play, in the 48h window,
+                                       or under review)
+   Every colour field on this page is one of those three states, the paper,
+   or the ink. No colour is used for mood alone.
+
+   TEXT/BACKDROP CONTRAST (measured, sRGB):
+     ink   on paper  16.5:1     paper on ink        16.5:1
+     ink   on acid   15.4:1     paper on ultra       6.7:1
+     ink   on flame   5.7:1     text-2 on paper      7.8:1
+     paper on ink-2  14.1:1     text-2 on ink        8.1:1
+   Rule locked by those numbers: acid and flame fields ALWAYS take ink text.
+   Ultramarine fields ALWAYS take paper text. Never the other way round.
+
+   TEXT OVER IMAGERY: only one section overlays type on a generated image
+   (publishers). Its scrim is ultramarine at 0.90 alpha. Worst case backdrop
+   (a pure white image underneath) flattens to #3A4AE3, giving paper text
+   5.5:1. Every other image on the page carries no text at all.
+   ========================================================================== */
+
+/* ---- reset ---- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body,h1,h2,h3,p,figure,ul,ol,dl,dd,blockquote{margin:0}
+ul,ol{padding:0;list-style:none}
+img,svg{display:block;max-width:100%}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit}
+
+/* ---- tokens: light is the locked page theme ---- */
+:root{
+  color-scheme:light dark;
+
+  --paper:#ECEEF2;
+  --paper-hi:#F7F8FA;
+  --ink:#0E1016;
+  --ink-2:#1B1F2B;
+
+  --flame:#FF4A1C;
+  --ultra:#2436E0;
+  --acid:#DDF247;
+
+  --surface:#ECEEF2;
+  --surface-hi:#F7F8FA;
+  --panel:#0E1016;
+  --text:#0E1016;
+  --text-2:#43485A;
+  --on-panel:#ECEEF2;
+  --on-panel-2:#A2A8BC;
+  --rule:rgba(14,16,22,.18);
+  --rule-panel:rgba(236,238,242,.20);
+  --ring:#0E1016;
+
+  --font-ui:system-ui,"Segoe UI Variable Display","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,"Cascadia Mono","Segoe UI Mono","SF Mono",Menlo,Consolas,monospace;
+
+  --wrap:1360px;
+  --gutter:clamp(20px,4vw,56px);
+  /* left edge of the centred container, so full-bleed sections can align
+     their type to the same rail the header uses */
+  --edge:max(var(--gutter),calc((100vw - var(--wrap)) / 2));
+  --pad-y:clamp(74px,9vw,136px);
+  /* the cookie banner really does cover 180 to 260px of a first anonymous
+     visit, so the hero keeps that band clear rather than pretending */
+  --cookie-reserve:clamp(180px,20vh,230px);
+  --nav-h:68px;
+
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --surface:#0E1016;
+    --surface-hi:#171A23;
+    --panel:#1B1F2B;
+    --text:#ECEEF2;
+    --text-2:#A2A8BC;
+    --rule:rgba(236,238,242,.18);
+    --ring:#ECEEF2;
+  }
+}
+:root[data-theme="dark"]{
+  --surface:#0E1016;
+  --surface-hi:#171A23;
+  --panel:#1B1F2B;
+  --text:#ECEEF2;
+  --text-2:#A2A8BC;
+  --rule:rgba(236,238,242,.18);
+  --ring:#ECEEF2;
+}
+
+html{scroll-padding-top:calc(var(--nav-h) + 18px)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+
+body{
+  background:var(--surface);
+  color:var(--text);
+  font-family:var(--font-ui);
+  font-size:17px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  /* No overflow-x hack. The only negative margins on this page pull an
+     element out to the gutter edge and never past the viewport, and
+     overflow-x on body would turn it into a scroll container and break
+     the sticky header. */
+}
+
+/* ---- shared primitives. ONE radius system on this page: 0. Everything is
+        square, including buttons, chips, inputs and images. ---- */
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gutter)}
+.stack>*+*{margin-top:1.05rem}
+.measure{max-width:60ch}
+.small{font-size:14px;line-height:1.5}
+.dim{color:var(--text-2)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+::selection{background:var(--acid);color:#0E1016}
+
+:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
+.on-ink :focus-visible,.on-ultra :focus-visible{outline-color:#ECEEF2}
+.on-acid :focus-visible,.on-flame :focus-visible{outline-color:#0E1016}
+
+.skip{
+  position:fixed;top:0;left:0;z-index:100;
+  transform:translateY(-110%);
+  background:var(--acid);color:#0E1016;font-weight:700;
+  padding:.85rem 1.2rem;
+}
+.skip:focus-visible{transform:translateY(0)}
+
+/* ---- type scale ---- */
+.h1{
+  font-size:clamp(32px,4.3vw,62px);
+  line-height:1.02;
+  letter-spacing:-.035em;
+  font-weight:800;
+  text-wrap:balance;
+}
+.h2{
+  font-size:clamp(27px,3.5vw,48px);
+  line-height:1.06;
+  letter-spacing:-.028em;
+  font-weight:800;
+  max-width:21ch;
+  text-wrap:balance;
+}
+.h3{font-size:clamp(19px,1.7vw,23px);line-height:1.18;letter-spacing:-.018em;font-weight:750}
+.lede{font-size:clamp(17px,1.35vw,19px);line-height:1.5;max-width:52ch}
+
+/* ---- links ---- */
+.link{
+  text-decoration:underline;
+  text-underline-offset:.22em;
+  text-decoration-thickness:2px;
+  text-decoration-color:var(--flame);
+  font-weight:600;
+}
+.link:hover{text-decoration-color:currentColor}
+.on-flame .link{text-decoration-color:#0E1016}
+.on-acid .link{text-decoration-color:#0E1016}
+.on-ultra .link{text-decoration-color:#DDF247}
+.on-ink .link{text-decoration-color:#FF4A1C}
+
+/* ---- buttons ---- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  white-space:nowrap;
+  font-weight:700;font-size:16px;letter-spacing:-.005em;
+  padding:.86rem 1.35rem;
+  border:2px solid transparent;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease),background-color .18s var(--ease);
+}
+.btn--primary{background:var(--flame);color:#0E1016;border-color:#0E1016;box-shadow:6px 6px 0 #0E1016}
+.btn--primary:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #0E1016}
+.btn--primary:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #0E1016}
+.on-ink .btn--primary{box-shadow:6px 6px 0 rgba(236,238,242,.28)}
+.on-ink .btn--primary:hover{box-shadow:8px 8px 0 rgba(236,238,242,.28)}
+.btn--ghost{background:transparent;border-color:currentColor}
+.btn--ghost:hover{transform:translate(-2px,-2px)}
+.btn--ghost:active{transform:translate(0,0)}
+.btn--sm{font-size:15px;padding:.62rem 1rem}
+.btn-row{display:flex;flex-wrap:wrap;gap:.85rem}
+
+/* ---- state chips: real semantic state on real data, three values only ---- */
+.chip{
+  display:inline-block;
+  font-size:13px;font-weight:750;line-height:1;
+  padding:.44rem .58rem;
+  color:#0E1016;
+}
+.chip--spendable{background:var(--acid)}
+.chip--committed{background:var(--flame)}
+.chip--held{background:var(--ultra);color:#ECEEF2}
+.chip--muted{background:transparent;border:2px solid var(--rule);color:var(--text-2);padding:.32rem .5rem}
+
+/* ---- panels ---- */
+.panel{background:var(--panel);color:var(--on-panel)}
+.panel .dim{color:var(--on-panel-2)}
+.field-acid{background:var(--acid);color:#0E1016}
+.field-acid .dim{color:#3A3F1E}
+.field-flame{background:var(--flame);color:#0E1016}
+.field-flame .dim{color:#3D1408}
+.field-ultra{background:var(--ultra);color:#ECEEF2}
+.field-ultra .dim{color:#CBD2FF}
+.bleed{width:100%}
+
+/* ==========================================================================
+   ART CONTAINERS
+   Each holds one IMAGE-SLOT. The batch generator inserts the real image
+   element immediately after the slot comment; until then the container's
+   own composed CSS field stands in for it.
+   ========================================================================== */
+.art{position:relative;overflow:hidden;background:var(--ink-2)}
+.art>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* one grade over every generated image so eight separate renders read as
+   one photographic world: fine scanline plus a soft vignette */
+.art::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(14,16,22,.05) 1px,transparent 1px),
+    radial-gradient(125% 105% at 50% 42%,transparent 52%,rgba(14,16,22,.26) 100%);
+  background-size:100% 7px,100% 100%;
+}
+.ph-hero{
+  background:
+    linear-gradient(90deg,transparent 62%,rgba(236,238,242,.9) 100%),
+    repeating-linear-gradient(180deg,
+      #2436E0 0 5.5%,#F7F8FA 5.5% 8%,
+      #2436E0 8% 13%,#F7F8FA 13% 16%,
+      #FF4A1C 16% 22%,#F7F8FA 22% 25%,
+      #2436E0 25% 32%,#F7F8FA 32% 35%,
+      #DDF247 35% 38%,#F7F8FA 38% 42%,
+      #2436E0 42% 51%,#F7F8FA 51% 55%,
+      #FF4A1C 55% 66%,#F7F8FA 66% 70%,
+      #2436E0 70% 84%,#F7F8FA 84% 88%,
+      #2436E0 88% 100%);
+}
+.ph-path{
+  background:
+    linear-gradient(180deg,rgba(14,16,22,.35),transparent 40%),
+    linear-gradient(90deg,
+      #DDF247 0 15%,#0E1016 15% 17%,
+      #FF4A1C 17% 32%,#0E1016 32% 34%,
+      #2436E0 34% 49%,#0E1016 49% 51%,
+      #FF4A1C 51% 66%,#0E1016 66% 68%,
+      #2436E0 68% 83%,#0E1016 83% 85%,
+      #DDF247 85% 100%);
+}
+.ph-board{
+  background:
+    linear-gradient(180deg,#F7F8FA,#DFE3EA),
+    #F7F8FA;
+  background-blend-mode:normal;
+  position:relative;
+}
+.ph-board::before{
+  content:"";position:absolute;inset:9%;
+  background-image:
+    linear-gradient(90deg,rgba(14,16,22,.14) 2px,transparent 2px),
+    linear-gradient(180deg,rgba(14,16,22,.14) 2px,transparent 2px);
+  background-size:33.33% 33.33%;
+  border-right:2px solid rgba(14,16,22,.14);
+  border-bottom:2px solid rgba(14,16,22,.14);
+}
+.ph-hold{
+  background:
+    radial-gradient(120% 90% at 30% 20%,rgba(236,238,242,.9),transparent 55%),
+    linear-gradient(160deg,#2436E0 0%,#0E1016 60%,#2436E0 100%);
+}
+.ph-hold::before{
+  content:"";position:absolute;left:38%;top:36%;width:24%;height:28%;
+  background:#FF4A1C;box-shadow:0 24px 60px rgba(14,16,22,.55);
+}
+.ph-rates{
+  background:
+    linear-gradient(178deg,#FF4A1C 0 46%,#ECEEF2 46% 50%,#FF4A1C 50% 100%);
+}
+.ph-brands{
+  background:
+    radial-gradient(90% 70% at 60% 12%,rgba(255,74,28,.28),transparent 60%),
+    repeating-linear-gradient(112deg,
+      #0E1016 0 22px,#2436E0 22px 40px,#0E1016 40px 62px,#DDF247 62px 70px),
+    #F7F8FA;
+}
+.ph-pub{
+  background:
+    linear-gradient(90deg,#DDF247 0 9%,#0E1016 9% 12%,transparent 12%),
+    repeating-linear-gradient(90deg,#E3E6EC 0 8%,#C9CEDA 8% 8.7%),
+    #ECEEF2;
+}
+.ph-close{
+  background:
+    linear-gradient(155deg,#F2F4F8 0 58%,#C3C8D3 58% 100%),
+    #ECEEF2;
+}
+.ph-close::before{
+  content:"";position:absolute;right:16%;bottom:22%;width:26%;height:4px;background:#FF4A1C;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.header{
+  position:sticky;top:0;z-index:40;
+  background:#0E1016;color:#ECEEF2;
+  border-bottom:2px solid #FF4A1C;
+}
+.header__in{
+  height:var(--nav-h);
+  display:flex;align-items:center;gap:clamp(14px,2.4vw,34px);
+}
+.brand{display:inline-flex;align-items:center;flex:0 0 auto}
+.brand svg{height:30px;width:auto}
+.nav{display:flex;align-items:center;gap:clamp(12px,1.8vw,26px);margin-left:auto}
+.nav a{
+  text-decoration:none;font-size:15px;font-weight:600;
+  padding:.35rem 0;border-bottom:2px solid transparent;
+  transition:border-color .16s var(--ease);
+}
+.nav a:hover{border-bottom-color:#FF4A1C}
+.header__cta{display:flex;align-items:center;gap:.7rem;flex:0 0 auto}
+.header__cta .btn{padding:.55rem 1rem;font-size:15px;box-shadow:none}
+.header__cta .btn--primary:hover,.header__cta .btn--primary:active{box-shadow:none}
+.menu-btn{display:none;margin-left:auto;background:transparent;border:2px solid rgba(236,238,242,.4);padding:.5rem .8rem;font-weight:700;font-size:15px;cursor:pointer}
+.menu-panel{display:none;border-top:2px solid rgba(236,238,242,.14);background:#0E1016}
+.menu-panel[data-open="true"]{display:block}
+.menu-panel ul{display:grid;padding:.6rem 0 1.1rem}
+.menu-panel a{display:block;padding:.72rem 0;font-size:17px;font-weight:650;text-decoration:none;border-bottom:2px solid rgba(236,238,242,.1)}
+.menu-panel .btn-row{padding-top:1rem}
+
+@media (max-width:1023px){
+  .nav,.header__cta{display:none}
+  .menu-btn{display:inline-block}
+}
+
+/* ==========================================================================
+   HERO - colour blocked diptych. Text sits on ink, art sits beside it.
+   No type is ever set over the hero image.
+   ========================================================================== */
+.hero{
+  background:#0E1016;color:#ECEEF2;
+  display:grid;
+  grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);
+  grid-template-rows:1fr auto var(--cookie-reserve);
+  min-height:calc(100dvh - var(--nav-h));
+}
+.hero__text{
+  grid-column:1;grid-row:1;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(32px,5vh,72px) clamp(20px,3.4vw,60px) clamp(28px,4vh,44px) var(--edge);
+}
+.hero__art{grid-column:2;grid-row:1 / span 3;position:relative}
+.hero__bar{grid-column:1;grid-row:2}
+.hero h1 .flame{color:var(--flame)}
+.hero .lede{color:#D3D7E1;margin-top:1.4rem}
+.hero .btn-row{margin-top:2rem}
+
+.compliance{
+  padding:1.05rem clamp(20px,3.4vw,60px) 1.05rem var(--edge);
+  display:grid;gap:.5rem 1.6rem;
+  grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);
+  align-items:stretch;
+  font-size:16px;line-height:1.4;font-weight:600;
+}
+.compliance b{font-weight:800;font-size:17px}
+.compliance span+span{border-left:2px solid rgba(14,16,22,.28);padding-left:1.5rem}
+
+@media (max-width:899px){
+  .hero{grid-template-columns:1fr;grid-template-rows:auto auto auto;min-height:0}
+  .hero__text{grid-column:1;grid-row:1;order:1;padding:clamp(30px,5vh,54px) var(--gutter) 1.6rem;max-width:none;margin:0}
+  .hero__bar{grid-column:1;grid-row:2;order:2}
+  .hero__art{grid-column:1;grid-row:3;order:3;aspect-ratio:21/9}
+  .compliance{grid-template-columns:1fr;padding:1.05rem var(--gutter)}
+  .compliance span+span{border-left:0;padding-left:0}
+  .hero .btn-row .btn--ghost{display:none}
+}
+
+/* ==========================================================================
+   MONEY PATH - horizontal state rail on an ink panel
+   ========================================================================== */
+.section{padding-block:var(--pad-y)}
+.section--flush{padding-block:0}
+.sec-head{max-width:44ch}
+.sec-head .h2+p{margin-top:1.1rem}
+
+.legend{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.6rem}
+
+.rail-wrap{margin-top:clamp(30px,4vw,52px)}
+/* Paper section, ink tiles. The gaps show the paper through, which is what
+   makes the rail read as a board of separate states rather than one slab. */
+.rail{
+  display:grid;grid-auto-flow:column;
+  grid-auto-columns:minmax(272px,1fr);
+  gap:3px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-padding-inline:var(--gutter);
+  border-block:2px solid var(--rule);
+  padding-block:3px;
+  scrollbar-width:thin;
+}
+.step{
+  scroll-snap-align:start;
+  background:var(--panel);color:var(--on-panel);
+  padding:1.5rem 1.4rem 1.7rem;
+  display:flex;flex-direction:column;gap:.85rem;
+}
+.step__top{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.step__verb{font-size:clamp(24px,2.5vw,32px);font-weight:800;letter-spacing:-.03em;line-height:1}
+.step__fact{font-size:15.5px;line-height:1.5}
+.step__stop{
+  font-size:15.5px;line-height:1.5;
+  border-left:4px solid var(--flame);
+  padding-left:.85rem;margin-top:auto;
+  color:#D3D7E1;
+}
+.rail-ctl{display:flex;gap:.6rem;margin-top:1.2rem;align-items:center}
+.rail-ctl button{
+  width:46px;height:46px;background:transparent;border:2px solid var(--rule);
+  color:inherit;font-size:25px;font-weight:700;line-height:1;cursor:pointer;
+  transition:background-color .16s var(--ease);
+}
+.rail-ctl button:hover{background:var(--surface-hi)}
+.rail-note{margin-left:auto;font-size:14px}
+
+/* explicit height, not aspect-ratio plus max-height: that pair makes the box
+   shrink on BOTH axes and the band stops being full bleed */
+.art--path{height:clamp(200px,21vw,300px);margin-top:clamp(30px,4vw,54px)}
+
+/* ==========================================================================
+   BOARD - the stateful competitions block
+   ========================================================================== */
+.board-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);
+  gap:clamp(28px,4vw,64px);
+  align-items:stretch;
+}
+/* the art matches whichever board state is showing, so the column never
+   leaves a dead gap under a short empty state or a tall open one */
+.art--board{height:100%;min-height:300px}
+[data-board="empty"] .board-state:not(.board-state--empty),
+[data-board="loading"] .board-state:not(.board-state--loading),
+[data-board="open"] .board-state:not(.board-state--open),
+[data-board="error"] .board-state:not(.board-state--error){display:none}
+
+.counters{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:2px;background:var(--rule);border:2px solid var(--rule);
+}
+/* absent means the whole block is removed, so nothing can depend on its height */
+[data-counters="absent"] .counters-block{display:none}
+.counters{margin-bottom:.9rem}
+.counter{background:var(--surface);padding:1.05rem 1.1rem}
+.counter__v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:clamp(24px,2.6vw,34px);font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.counter__v.is-unreported{font-size:clamp(15px,1.4vw,17px);font-weight:650;font-family:var(--font-ui);color:var(--text-2)}
+.counter__l{font-size:14px;color:var(--text-2);margin-top:.3rem}
+.counters-note{font-size:14px;color:var(--text-2);max-width:64ch}
+.tag-sample{
+  display:inline-block;background:#2436E0;color:#ECEEF2;
+  font-size:12px;font-weight:700;padding:.2rem .42rem;vertical-align:.15em;margin-left:.45rem;
+}
+/* ultramarine on orange is a weak edge, so the sample tag inverts on flame */
+.field-flame .tag-sample{background:#0E1016;color:#DDF247}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:2px;background:var(--rule);border:2px solid var(--rule)}
+.card{background:var(--surface);display:flex;flex-direction:column}
+.card__plate{
+  height:104px;position:relative;
+  background:
+    repeating-linear-gradient(135deg,rgba(14,16,22,.10) 0 10px,transparent 10px 20px),
+    var(--surface-hi);
+  border-bottom:2px solid var(--rule);
+  display:flex;align-items:flex-end;padding:.8rem;
+}
+.card__plate span{font-size:13.5px;font-weight:650;color:var(--text-2)}
+.card__body{padding:1.15rem 1.15rem 1.3rem;display:flex;flex-direction:column;gap:.75rem;flex:1}
+.card__title{font-size:19px;font-weight:750;letter-spacing:-.018em;line-height:1.15}
+.card__rows{display:grid;gap:.42rem;font-size:15px}
+.card__row{display:flex;justify-content:space-between;gap:1rem}
+.card__row dt{color:var(--text-2)}
+.card__row dd{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:650;text-align:right}
+.card .btn{margin-top:auto}
+
+/* skeleton fill is lighter than the grid gap, otherwise two adjacent plates
+   merge into one band and the loading state looks like a single broken tile */
+.skel{background:var(--surface);padding:1.15rem;--skel:rgba(14,16,22,.11)}
+:root[data-theme="dark"] .skel{--skel:rgba(236,238,242,.13)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .skel{--skel:rgba(236,238,242,.13)}}
+.skel__plate{height:104px;background:var(--skel);margin:-1.15rem -1.15rem 1.15rem}
+.skel__line{height:14px;background:var(--skel);margin-bottom:.7rem;width:var(--w,100%)}
+.skel__btn{height:42px;background:var(--skel);margin-top:1.1rem}
+@media (prefers-reduced-motion:no-preference){
+  .js .skel__plate,.js .skel__line,.js .skel__btn{animation:pulse 1.5s ease-in-out infinite}
+  .js .skel__line{animation-delay:calc(var(--i,0) * .12s)}
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+.notice{border-left:6px solid var(--flame);padding:1.1rem 1.3rem;background:var(--surface-hi)}
+
+@media (max-width:899px){
+  .board-grid{grid-template-columns:1fr}
+  .art--board{height:auto;aspect-ratio:16/9}
+  .counters{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* ==========================================================================
+   48 HOUR HOLD - editorial split
+   ========================================================================== */
+.hold{display:grid;grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);align-items:stretch}
+.art--hold{height:100%;min-height:340px}
+.hold__body{padding:clamp(38px,5vw,76px) clamp(24px,4vw,72px)}
+.bignum{
+  font-size:clamp(112px,17vw,212px);font-weight:800;line-height:.8;
+  letter-spacing:-.05em;color:var(--acid);
+  font-variant-numeric:tabular-nums;
+}
+.bignum-row{display:flex;align-items:flex-end;gap:1rem;flex-wrap:wrap}
+.bignum-row p{font-size:clamp(18px,1.8vw,24px);font-weight:750;letter-spacing:-.02em;padding-bottom:.9rem;line-height:1.15}
+.timeline{margin-top:2.4rem;max-width:52ch}
+/* ink track on the ultramarine field is a weak edge on its own, so it
+   carries a paper ring to keep the graphic boundary above 3:1 */
+.timeline__track{height:12px;background:#0E1016;box-shadow:0 0 0 2px rgba(236,238,242,.9);position:relative;overflow:hidden}
+.timeline__fill{position:absolute;inset:0;background:var(--acid);transform-origin:left center;transform:scaleX(0)}
+@media (prefers-reduced-motion:no-preference){
+  .js .timeline__fill{transition:transform 1.5s var(--ease)}
+}
+.timeline.is-run .timeline__fill{transform:scaleX(1)}
+.timeline__ends{display:flex;justify-content:space-between;font-size:14px;margin-top:.85rem;color:#D3D7E1}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;margin-top:2.6rem}
+.pair>div{padding:1.25rem 1.25rem 1.4rem;background:var(--panel);color:var(--on-panel);display:flex;flex-direction:column;gap:.7rem}
+.pair p{font-size:16px;line-height:1.5}
+@media (max-width:899px){
+  .hold{grid-template-columns:1fr}
+  .art--hold{height:auto;min-height:0;aspect-ratio:16/9}
+  .pair{grid-template-columns:1fr}
+}
+
+/* ==========================================================================
+   COMMISSION - stacked poster band
+   ========================================================================== */
+.art--rates{height:clamp(190px,20vw,290px)}
+.rates__body{padding:clamp(40px,5vw,74px) 0}
+.rates__grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(24px,4vw,60px);align-items:end}
+.ratebox{border:3px solid #0E1016;padding:1.15rem 1.25rem;background:rgba(14,16,22,.06)}
+.ratebox .mono{font-size:clamp(30px,4vw,52px);font-weight:800;line-height:1;letter-spacing:-.03em}
+[data-rates="unreadable"] .rate-readable{display:none}
+[data-rates="readable"] .rate-fallback{display:none}
+@media (max-width:899px){.rates__grid{grid-template-columns:1fr}}
+
+/* ==========================================================================
+   BRANDS - off grid editorial offset
+   ========================================================================== */
+.brands{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:center}
+.art--brands{aspect-ratio:4/3;margin-left:calc(var(--gutter) * -1)}
+.brands__body{padding-block:clamp(10px,2vw,28px)}
+@media (max-width:899px){
+  .brands{grid-template-columns:1fr}
+  .art--brands{margin-left:calc(var(--gutter) * -1);margin-right:calc(var(--gutter) * -1)}
+}
+
+/* ==========================================================================
+   PUBLISHERS - image as canvas, the one place type sits over art
+   ========================================================================== */
+/* the ultramarine field is also the fallback: if the art never loads, the
+   scrim still sits on brand colour and the text contrast is unchanged */
+.pub{position:relative;min-height:min(76vh,660px);display:flex;align-items:flex-end}
+.pub .art{position:absolute;inset:0}
+.pub__scrim{position:absolute;inset:0;background:rgba(36,54,224,.90)}
+.pub__body{position:relative;z-index:1;padding:clamp(44px,6vw,92px) 0;width:100%}
+.pub__body .h2{max-width:17ch}
+
+/* ==========================================================================
+   CLOSE - mini minimalist type band
+   ========================================================================== */
+.close{padding-block:clamp(58px,7vw,104px)}
+.close__in{display:flex;flex-wrap:wrap;gap:clamp(20px,3vw,48px);align-items:flex-end;justify-content:space-between}
+.close h2{font-size:clamp(30px,4.6vw,64px);line-height:1.02;letter-spacing:-.035em;font-weight:800;max-width:15ch}
+
+/* ==========================================================================
+   RESPONSIBLE PLAY
+   ========================================================================== */
+.resp{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:clamp(28px,4vw,64px);align-items:start}
+.art--close{aspect-ratio:16/9}
+.resp__cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;background:var(--rule);border:2px solid var(--rule);margin-top:1.6rem}
+.resp__cols>div{background:var(--surface);padding:1.25rem}
+.gamcare{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:clamp(20px,2.2vw,27px);font-weight:700;letter-spacing:-.02em;display:block;margin-block:.35rem .5rem}
+@media (max-width:899px){.resp,.resp__cols{grid-template-columns:1fr}}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer{background:#0E1016;color:#ECEEF2;padding-block:clamp(48px,6vw,84px);border-top:2px solid var(--flame)}
+.footer a{text-decoration:none}
+.footer a:hover{text-decoration:underline;text-underline-offset:.2em}
+.footer__top{display:flex;flex-wrap:wrap;gap:2rem;align-items:flex-start;justify-content:space-between;padding-bottom:2.2rem;border-bottom:2px solid rgba(236,238,242,.16)}
+.footer__age{font-size:clamp(19px,2vw,26px);font-weight:800;letter-spacing:-.02em;max-width:26ch}
+.footer__cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2rem;padding-top:2.2rem}
+.footer__cols h2{font-size:14px;font-weight:750;color:#A2A8BC;margin-bottom:.8rem}
+.footer__cols li+li{margin-top:.5rem}
+.footer__cols a{font-size:15.5px;font-weight:600}
+.footer__end{margin-top:2.6rem;padding-top:1.6rem;border-top:2px solid rgba(236,238,242,.16);font-size:14px;color:#A2A8BC;display:flex;flex-wrap:wrap;gap:1rem 2rem}
+@media (max-width:719px){.footer__cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ==========================================================================
+   MOTION - scroll reveal, one shot, hierarchy only
+   ========================================================================== */
+.js .reveal{opacity:0;transform:translateY(22px)}
+@media (prefers-reduced-motion:no-preference){
+  .js .reveal{transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:calc(var(--i,0) * 70ms)}
+  .js .hero__text>*{animation:rise .8s var(--ease) both;animation-delay:calc(var(--i,0) * 90ms)}
+  /* scales inward from its right edge, so the entry can never push the
+     document wider than the viewport and flash a horizontal scrollbar */
+  .js .hero__art{transform-origin:right center;animation:slabIn .95s var(--ease) both;animation-delay:.1s}
+}
+.js .reveal.is-in{opacity:1;transform:none}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes slabIn{from{opacity:0;transform:scaleX(.9)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .js .reveal{opacity:1;transform:none}
+  .timeline__fill{transform:scaleX(1)}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+
+/* ==========================================================================
+   DESIGN CHROME - review rig and cookie ghost. Not part of the page.
+   ========================================================================== */
+.rig{
+  position:fixed;right:12px;top:calc(var(--nav-h) + 14px);z-index:90;
+  width:250px;background:#0E1016;color:#ECEEF2;
+  border:2px solid #DDF247;font-size:13px;line-height:1.4;
+}
+.rig summary{cursor:pointer;padding:.6rem .7rem;font-weight:750;background:#DDF247;color:#0E1016;list-style:none}
+.rig summary::-webkit-details-marker{display:none}
+.rig__in{padding:.7rem}
+.rig p{color:#A2A8BC;margin-bottom:.7rem}
+.rig label{display:block;font-weight:650;margin-bottom:.25rem}
+.rig select{width:100%;background:#0E1016;color:#ECEEF2;border:2px solid rgba(236,238,242,.4);padding:.4rem;margin-bottom:.7rem}
+.rig .row{display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem;font-weight:650}
+.rig input[type=checkbox]{width:16px;height:16px;accent-color:#DDF247}
+.rig :focus-visible{outline-color:#DDF247}
+@media (max-width:1279px){.rig{width:210px;transform:scale(.94);transform-origin:top right}}
+
+.cookie-ghost{
+  position:fixed;left:0;right:0;bottom:0;z-index:80;
+  min-height:var(--cookie-reserve);
+  background:repeating-linear-gradient(135deg,rgba(36,54,224,.92) 0 22px,rgba(24,38,180,.92) 22px 44px);
+  color:#ECEEF2;display:none;align-items:center;
+  border-top:3px solid #DDF247;
+}
+[data-cookie="on"] .cookie-ghost{display:flex}
+.cookie-ghost .wrap{width:100%}
+.cookie-ghost p{font-weight:700;max-width:70ch}
+.cookie-ghost .small{font-weight:500;color:#CBD2FF;margin-top:.4rem}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="header on-ink">
+  <div class="wrap header__in">
+    <a class="brand" href="/" aria-label="Boadman home">
+      <svg aria-hidden="true" focusable="false" width="164" height="55" viewBox="0 0 164 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3402_681)">
+<path d="M44.8777 31.1463V20.1519C44.8777 20.1519 44.8282 19.9155 44.7291 19.4426C44.6364 18.9698 44.4755 18.6687 44.2587 18.5183C44.0297 18.3892 43.8875 18.3141 43.8319 18.2819C43.7824 18.2496 43.7514 18.2388 43.7514 18.2388L44.426 17.8197H53.8145C53.8145 17.8197 54.1735 17.8626 54.8916 17.9379C55.6156 18.013 56.2407 18.4752 56.7731 19.3351C57.2929 20.2161 57.6332 20.9794 57.7943 21.6242C57.9616 22.2584 58.0418 22.5808 58.0418 22.5808L55.591 25.4718C55.591 25.4718 56.2223 26.2135 57.4848 27.6858C58.7535 29.1474 59.4529 30.4373 59.6015 31.5549C59.7438 32.6619 59.5211 33.9194 58.9208 35.3057C58.3205 36.6813 57.3982 37.6486 56.1543 38.1967C53.7714 39.2928 51.2465 39.8732 48.5728 39.9485C45.9055 40.013 43.5103 39.8301 41.3936 39.3897C42.1673 39.2713 43.1946 39.1102 44.4759 38.9382C45.7569 38.7556 47.063 38.5298 48.3873 38.2398C49.7118 37.9603 50.9309 37.6272 52.0512 37.2404C53.1652 36.8533 53.9451 36.3698 54.3783 35.8001C55.2386 34.6931 55.5604 33.5325 55.3562 32.3289C55.152 31.1143 54.8735 30.3191 54.5209 29.9109C54.162 29.5347 53.481 28.7179 52.4849 27.4603C51.4883 26.2028 50.9871 25.5689 50.9871 25.5689L54.9975 23.054C54.9975 23.054 54.7128 22.5918 54.1433 21.6784C53.5738 20.7649 52.986 20.2705 52.3855 20.1847C51.7668 20.1203 50.8137 20.0985 49.5263 20.1203C48.2389 20.1418 47.5955 20.1525 47.5955 20.1525V36.8428L44.8785 31.147L44.8777 31.1463ZM75.284 26.4819C75.8535 30.4693 75.1541 33.7256 73.1796 36.2296C71.2116 38.7338 69.1382 39.8621 66.96 39.615C65.5488 39.4646 64.2924 38.6478 63.1908 37.154C62.0891 35.6708 61.4455 33.3388 61.2536 30.1682C61.1175 28.1693 61.3774 25.9769 62.0335 23.5909C62.6832 21.1943 63.0114 20.0013 63.0114 20.0013L62.1759 17.8197C63.1538 17.8197 64.1438 17.8088 65.1404 17.7766C66.1368 17.7444 67.127 17.7766 68.1049 17.8519C69.4477 17.9808 70.7723 18.3999 72.0781 19.0985C73.384 19.8079 74.4298 20.9685 75.2097 22.6128C75.2097 22.6128 75.1292 22.6343 74.9683 22.6881C74.8074 22.7417 74.6465 22.8385 74.4856 22.989C74.3186 23.1609 74.3867 23.6231 74.696 24.3862C75.0055 25.1601 75.2035 25.8587 75.284 26.4819ZM68.7608 20.4741C67.5726 20.4741 66.5639 21.2802 65.722 22.9138C64.8804 24.5366 64.4595 26.4928 64.4595 28.7819C64.4595 31.071 64.8804 33.027 65.722 34.6391C66.5639 36.2512 67.5724 37.068 68.7608 37.068C69.9429 37.068 70.9578 36.2512 71.7933 34.6391C72.6349 33.027 73.0558 31.071 73.0558 28.7819C73.0558 26.4928 72.6349 24.5366 71.7933 22.9138C70.9578 21.2802 69.9429 20.4741 68.7608 20.4741ZM80.9593 53.6614C80.9593 53.6614 80.7118 53.2315 80.2166 52.3825C79.7214 51.5334 79.1831 50.3727 78.6013 48.9004C78.0258 47.4281 77.506 45.73 77.0541 43.7847C76.6021 41.8395 76.3979 39.7651 76.4474 37.562C76.5525 33.1555 76.9055 29.8239 77.4994 27.5672C78.0874 25.3103 78.5888 23.752 78.9848 22.8921C79.3686 22.0753 79.6843 21.4734 79.9194 21.0865C80.1546 20.6997 80.2166 20.2482 80.1113 19.7433C79.9999 19.2596 79.839 18.8834 79.6286 18.5932C79.4183 18.3137 79.313 18.1741 79.313 18.1741H90.3727C90.3727 18.1741 90.2303 18.389 89.9518 18.8189C89.6733 19.2489 89.5124 19.7217 89.4629 20.2484C89.395 20.7965 89.3763 21.28 89.4071 21.6993C89.4443 22.1184 89.4629 22.3226 89.4629 22.3226V36.3692C89.4629 36.3692 89.4814 36.6916 89.5124 37.3257C89.5432 37.9706 89.6546 38.4112 89.8467 38.6369C90.0386 38.8947 90.2116 39.1527 90.3602 39.4213C90.5149 39.7008 90.5892 39.8297 90.5892 39.8297H85.3844C85.3844 39.8297 85.5763 39.6364 85.9663 39.2493C86.35 38.8625 86.5852 38.4647 86.6718 38.0672C86.7584 37.6697 86.8079 37.3257 86.8266 37.0353C86.8453 36.7345 86.8514 36.5947 86.8514 36.5947V29.0073H81.7579L82.3212 26.9224H86.5854V19.7433C86.4122 19.6789 85.9232 19.8184 85.1064 20.1408C84.2894 20.4632 83.4167 21.3229 82.4946 22.7092C81.5662 24.0958 80.7184 26.1807 79.9447 28.975C79.171 31.7585 78.7564 35.5846 78.6944 40.4316C78.5151 44.2684 78.843 47.4387 79.6908 49.9216C80.5388 52.4149 80.9595 53.6614 80.9595 53.6614H80.9593ZM92.347 19.8722C92.3841 19.4316 92.2975 19.0231 92.0808 18.647C91.8705 18.2708 91.7032 18.0021 91.5856 17.8517C91.5856 17.8517 91.9632 17.8517 92.7244 17.8517C93.4856 17.8517 94.3521 17.8517 95.3174 17.8408C96.289 17.83 97.2111 17.8195 98.0962 17.8195C98.9752 17.8195 99.5384 17.8302 99.7797 17.8517C101.123 17.9806 102.447 18.3997 103.753 19.0983C105.053 19.8077 106.099 20.9683 106.885 22.6126C106.885 22.6126 106.804 22.6341 106.643 22.6879C106.482 22.7415 106.322 22.8383 106.161 22.9888C105.994 23.1607 106.062 23.6229 106.371 24.3859C106.68 25.1599 106.872 25.8585 106.959 26.4817C107.312 29.0181 107.2 31.1461 106.625 32.8549C106.049 34.5743 105.257 35.9394 104.242 36.9496C103.227 37.9706 102.107 38.6692 100.894 39.0667C99.6806 39.4535 98.6163 39.5824 97.694 39.4535C96.9451 39.3891 95.7443 39.3891 94.092 39.4535C92.4457 39.518 91.6227 39.5502 91.6227 39.5502C91.6227 39.5502 91.6351 39.5611 91.6537 39.5611C91.6784 39.572 91.7775 39.4429 91.9445 39.1742C92.1054 38.9165 92.2107 38.5187 92.2663 37.9814C92.3158 37.4333 92.3468 37.1538 92.3468 37.1538V19.8724L92.347 19.8722ZM95.7014 20.3128V37.3473C95.7014 37.3473 96.4626 37.3366 97.9914 37.3151C99.5199 37.2937 100.479 37.0786 100.869 36.6489C101.253 36.2512 101.841 35.499 102.627 34.3918C103.413 33.2741 103.754 31.3503 103.642 28.6206C103.475 24.5688 102.646 22.0862 101.166 21.1512C99.6874 20.2161 97.8617 19.9366 95.7016 20.3128H95.7014ZM120.179 22.8921C120.432 22.387 120.55 22.1506 120.538 22.1722C121.856 19.9046 123.583 18.6685 125.705 18.4752C127.834 18.271 129.79 18.1743 131.566 18.1743C131.566 18.1743 131.424 18.3892 131.145 18.8192C130.867 19.2491 130.706 19.7219 130.656 20.2486C130.595 20.7967 130.582 21.2802 130.613 21.6995C130.644 22.1186 130.656 22.3228 130.656 22.3228V36.3694C130.656 36.3694 130.675 36.6918 130.706 37.3259C130.731 37.9708 130.854 38.4114 131.059 38.6371C131.251 38.8949 131.418 39.1529 131.566 39.4215C131.708 39.701 131.783 39.8299 131.783 39.8299H126.578C126.578 39.8299 126.77 39.6366 127.16 39.2495C127.543 38.8627 127.785 38.465 127.884 38.0674C127.958 37.6699 128.001 37.3259 128.02 37.0355C128.038 36.7347 128.044 36.5949 128.044 36.5949L128.119 19.7435C127.029 20.0013 126.051 20.6354 125.179 21.6564C124.312 22.6668 123.588 23.6876 123.007 24.7194C122.425 25.7511 122.01 26.5893 121.756 27.2343C121.503 27.89 121.459 27.9542 121.626 27.4276C121.88 28.6206 122.109 30.05 122.32 31.7158C122.524 33.371 122.654 35.3164 122.716 37.5624C122.765 39.7655 122.555 41.8399 122.09 43.7851C121.626 45.7302 121.1 47.4285 120.525 48.9008C119.943 50.3731 119.405 51.5338 118.916 52.3829C118.427 53.2319 118.185 53.6618 118.185 53.6618C118.185 53.6618 118.606 52.4151 119.442 49.922C120.283 47.4391 120.617 44.269 120.45 40.4321C120.376 35.585 119.937 31.7589 119.126 28.9754C118.315 26.1813 117.43 24.0962 116.459 22.7096C115.493 21.3233 114.583 20.4636 113.729 20.1412C112.881 19.8186 112.38 19.6791 112.238 19.7437L112.287 36.5951C112.287 36.5951 112.294 36.7349 112.306 37.0357C112.318 37.3259 112.374 37.6699 112.473 38.0676C112.541 38.4652 112.783 38.8629 113.179 39.2497C113.575 39.6368 113.779 39.8301 113.779 39.8301H108.555C108.555 39.8301 108.63 39.7012 108.772 39.4217C108.921 39.1531 109.094 38.8951 109.298 38.6373C109.49 38.4116 109.608 37.971 109.645 37.3261C109.682 36.692 109.7 36.3696 109.7 36.3696V22.323C109.7 22.323 109.713 22.1188 109.731 21.6997C109.756 21.2804 109.744 20.7969 109.7 20.2488C109.626 19.7222 109.453 19.2493 109.187 18.8194C108.927 18.3894 108.791 18.1745 108.791 18.1745H119.832C119.832 18.1745 119.727 18.3143 119.516 18.5936C119.306 18.8838 119.145 19.2598 119.034 19.7437C118.928 20.2488 118.99 20.7003 119.225 21.0869C119.461 21.4738 119.776 22.0757 120.178 22.8925L120.179 22.8921ZM137 53.6614C137 53.6614 136.753 53.2315 136.257 52.3825C135.762 51.5334 135.224 50.3727 134.642 48.9004C134.067 47.4281 133.547 45.73 133.095 43.7847C132.643 41.8395 132.439 39.7651 132.488 37.562C132.593 33.1555 132.946 29.8239 133.54 27.5672C134.129 25.3103 134.63 23.752 135.026 22.8921C135.41 22.0753 135.725 21.4734 135.96 21.0865C136.195 20.6997 136.257 20.2482 136.152 19.7433C136.041 19.2596 135.88 18.8834 135.67 18.5932C135.459 18.3137 135.354 18.1741 135.354 18.1741H146.414C146.414 18.1741 146.271 18.389 145.993 18.8189C145.714 19.2489 145.553 19.7217 145.504 20.2484C145.436 20.7965 145.417 21.28 145.448 21.6993C145.485 22.1184 145.504 22.3226 145.504 22.3226V36.3692C145.504 36.3692 145.522 36.6916 145.553 37.3257C145.584 37.9706 145.695 38.4112 145.888 38.6369C146.079 38.8947 146.253 39.1527 146.401 39.4213C146.556 39.7008 146.63 39.8297 146.63 39.8297H141.425C141.425 39.8297 141.617 39.6364 142.007 39.2493C142.391 38.8625 142.626 38.4647 142.712 38.0672C142.799 37.6697 142.849 37.3257 142.867 37.0353C142.885 36.7345 142.892 36.5947 142.892 36.5947V29.0073H137.798L138.362 26.9224H142.626V19.7433C142.453 19.6789 141.964 19.8184 141.147 20.1408C140.33 20.4632 139.457 21.3229 138.535 22.7092C137.607 24.0958 136.759 26.1807 135.985 28.975C135.212 31.7585 134.797 35.5846 134.735 40.4316C134.556 44.2684 134.884 47.4387 135.732 49.9216C136.579 52.4149 137 53.6614 137 53.6614H137ZM159.726 39.787C159.905 36.2095 159.171 32.5913 158.47 28.975C157.918 26.1289 156.842 24.0958 155.92 22.7092C154.998 21.3231 154.125 20.4632 153.308 20.1408C152.491 19.8182 152.015 19.6786 151.866 19.7433L151.94 36.5947L152.101 38.0672C152.138 38.4863 152.367 38.884 152.782 39.2709C153.203 39.6471 153.407 39.8297 153.407 39.8297H147.843C147.843 39.8297 147.917 39.7008 148.06 39.4213C148.208 39.1527 148.381 38.8947 148.586 38.6369C148.778 38.4112 148.895 37.9706 148.932 37.3257C148.969 36.6916 148.982 36.3692 148.982 36.3692V22.3226C148.982 22.3226 148.994 22.1184 149.019 21.6993C149.044 21.28 149.031 20.7965 148.982 20.2484C148.914 19.7217 148.74 19.2489 148.474 18.8189C148.208 18.389 148.078 18.1741 148.078 18.1741H155.387L159.249 20.4417C158.569 20.8392 158.358 21.3229 158.612 21.8818C159.627 24.3 160.419 26.5244 160.988 28.5666C161.558 30.5978 162.076 33.5955 162.003 37.562L161.963 39.7825C161.217 39.784 160.472 39.7856 159.726 39.787H159.726Z" fill="black" stroke="#FF5733" stroke-width="3.97936" stroke-miterlimit="2.61313"/>
+<path d="M44.8777 31.1463V20.1519C44.8777 20.1519 44.8282 19.9155 44.7291 19.4426C44.6364 18.9698 44.4755 18.6687 44.2587 18.5183C44.0297 18.3892 43.8875 18.3141 43.8319 18.2819C43.7824 18.2496 43.7514 18.2388 43.7514 18.2388L44.426 17.8197H53.8145C53.8145 17.8197 54.1735 17.8626 54.8916 17.9379C55.6156 18.013 56.2407 18.4752 56.7731 19.3351C57.2929 20.2161 57.6332 20.9794 57.7943 21.6242C57.9616 22.2584 58.0418 22.5808 58.0418 22.5808L55.591 25.4718C55.591 25.4718 56.2223 26.2135 57.4848 27.6858C58.7535 29.1474 59.4529 30.4373 59.6015 31.5549C59.7438 32.6619 59.5211 33.9194 58.9208 35.3057C58.3205 36.6813 57.3982 37.6486 56.1543 38.1967C53.7714 39.2928 51.2465 39.8732 48.5728 39.9485C45.9055 40.013 43.5103 39.8301 41.3936 39.3897C42.1673 39.2713 43.1946 39.1102 44.4759 38.9382C45.7569 38.7556 47.063 38.5298 48.3873 38.2398C49.7118 37.9603 50.9309 37.6272 52.0512 37.2404C53.1652 36.8533 53.9451 36.3698 54.3783 35.8001C55.2386 34.6931 55.5604 33.5325 55.3562 32.3289C55.152 31.1143 54.8735 30.3191 54.5209 29.9109C54.162 29.5347 53.481 28.7179 52.4849 27.4603C51.4883 26.2028 50.9871 25.5689 50.9871 25.5689L54.9975 23.054C54.9975 23.054 54.7128 22.5918 54.1433 21.6784C53.5738 20.7649 52.986 20.2705 52.3855 20.1847C51.7668 20.1203 50.8137 20.0985 49.5263 20.1203C48.2389 20.1418 47.5955 20.1525 47.5955 20.1525V36.8428L44.8785 31.147L44.8777 31.1463ZM75.284 26.4819C75.8535 30.4693 75.1541 33.7256 73.1796 36.2296C71.2116 38.7338 69.1382 39.8621 66.96 39.615C65.5488 39.4646 64.2924 38.6478 63.1908 37.154C62.0891 35.6708 61.4455 33.3388 61.2536 30.1682C61.1175 28.1693 61.3774 25.9769 62.0335 23.5909C62.6832 21.1943 63.0114 20.0013 63.0114 20.0013L62.1759 17.8197C63.1538 17.8197 64.1438 17.8088 65.1404 17.7766C66.1368 17.7444 67.127 17.7766 68.1049 17.8519C69.4477 17.9808 70.7723 18.3999 72.0781 19.0985C73.384 19.8079 74.4298 20.9685 75.2097 22.6128C75.2097 22.6128 75.1292 22.6343 74.9683 22.6881C74.8074 22.7417 74.6465 22.8385 74.4856 22.989C74.3186 23.1609 74.3867 23.6231 74.696 24.3862C75.0055 25.1601 75.2035 25.8587 75.284 26.4819ZM68.7608 20.4741C67.5726 20.4741 66.5639 21.2802 65.722 22.9138C64.8804 24.5366 64.4595 26.4928 64.4595 28.7819C64.4595 31.071 64.8804 33.027 65.722 34.6391C66.5639 36.2512 67.5724 37.068 68.7608 37.068C69.9429 37.068 70.9578 36.2512 71.7933 34.6391C72.6349 33.027 73.0558 31.071 73.0558 28.7819C73.0558 26.4928 72.6349 24.5366 71.7933 22.9138C70.9578 21.2802 69.9429 20.4741 68.7608 20.4741ZM80.9593 53.6614C80.9593 53.6614 80.7118 53.2315 80.2166 52.3825C79.7214 51.5334 79.1831 50.3727 78.6013 48.9004C78.0258 47.4281 77.506 45.73 77.0541 43.7847C76.6021 41.8395 76.3979 39.7651 76.4474 37.562C76.5525 33.1555 76.9055 29.8239 77.4994 27.5672C78.0874 25.3103 78.5888 23.752 78.9848 22.8921C79.3686 22.0753 79.6843 21.4734 79.9194 21.0865C80.1546 20.6997 80.2166 20.2482 80.1113 19.7433C79.9999 19.2596 79.839 18.8834 79.6286 18.5932C79.4183 18.3137 79.313 18.1741 79.313 18.1741H90.3727C90.3727 18.1741 90.2303 18.389 89.9518 18.8189C89.6733 19.2489 89.5124 19.7217 89.4629 20.2484C89.395 20.7965 89.3763 21.28 89.4071 21.6993C89.4443 22.1184 89.4629 22.3226 89.4629 22.3226V36.3692C89.4629 36.3692 89.4814 36.6916 89.5124 37.3257C89.5432 37.9706 89.6546 38.4112 89.8467 38.6369C90.0386 38.8947 90.2116 39.1527 90.3602 39.4213C90.5149 39.7008 90.5892 39.8297 90.5892 39.8297H85.3844C85.3844 39.8297 85.5763 39.6364 85.9663 39.2493C86.35 38.8625 86.5852 38.4647 86.6718 38.0672C86.7584 37.6697 86.8079 37.3257 86.8266 37.0353C86.8453 36.7345 86.8514 36.5947 86.8514 36.5947V29.0073H81.7579L82.3212 26.9224H86.5854V19.7433C86.4122 19.6789 85.9232 19.8184 85.1064 20.1408C84.2894 20.4632 83.4167 21.3229 82.4946 22.7092C81.5662 24.0958 80.7184 26.1807 79.9447 28.975C79.171 31.7585 78.7564 35.5846 78.6944 40.4316C78.5151 44.2684 78.843 47.4387 79.6908 49.9216C80.5388 52.4149 80.9595 53.6614 80.9595 53.6614H80.9593ZM92.347 19.8722C92.3841 19.4316 92.2975 19.0231 92.0808 18.647C91.8705 18.2708 91.7032 18.0021 91.5856 17.8517C91.5856 17.8517 91.9632 17.8517 92.7244 17.8517C93.4856 17.8517 94.3521 17.8517 95.3174 17.8408C96.289 17.83 97.2111 17.8195 98.0962 17.8195C98.9752 17.8195 99.5384 17.8302 99.7797 17.8517C101.123 17.9806 102.447 18.3997 103.753 19.0983C105.053 19.8077 106.099 20.9683 106.885 22.6126C106.885 22.6126 106.804 22.6341 106.643 22.6879C106.482 22.7415 106.322 22.8383 106.161 22.9888C105.994 23.1607 106.062 23.6229 106.371 24.3859C106.68 25.1599 106.872 25.8585 106.959 26.4817C107.312 29.0181 107.2 31.1461 106.625 32.8549C106.049 34.5743 105.257 35.9394 104.242 36.9496C103.227 37.9706 102.107 38.6692 100.894 39.0667C99.6806 39.4535 98.6163 39.5824 97.694 39.4535C96.9451 39.3891 95.7443 39.3891 94.092 39.4535C92.4457 39.518 91.6227 39.5502 91.6227 39.5502C91.6227 39.5502 91.6351 39.5611 91.6537 39.5611C91.6784 39.572 91.7775 39.4429 91.9445 39.1742C92.1054 38.9165 92.2107 38.5187 92.2663 37.9814C92.3158 37.4333 92.3468 37.1538 92.3468 37.1538V19.8724L92.347 19.8722ZM95.7014 20.3128V37.3473C95.7014 37.3473 96.4626 37.3366 97.9914 37.3151C99.5199 37.2937 100.479 37.0786 100.869 36.6489C101.253 36.2512 101.841 35.499 102.627 34.3918C103.413 33.2741 103.754 31.3503 103.642 28.6206C103.475 24.5688 102.646 22.0862 101.166 21.1512C99.6874 20.2161 97.8617 19.9366 95.7016 20.3128H95.7014ZM120.179 22.8921C120.432 22.387 120.55 22.1506 120.538 22.1722C121.856 19.9046 123.583 18.6685 125.705 18.4752C127.834 18.271 129.79 18.1743 131.566 18.1743C131.566 18.1743 131.424 18.3892 131.145 18.8192C130.867 19.2491 130.706 19.7219 130.656 20.2486C130.595 20.7967 130.582 21.2802 130.613 21.6995C130.644 22.1186 130.656 22.3228 130.656 22.3228V36.3694C130.656 36.3694 130.675 36.6918 130.706 37.3259C130.731 37.9708 130.854 38.4114 131.059 38.6371C131.251 38.8949 131.418 39.1529 131.566 39.4215C131.708 39.701 131.783 39.8299 131.783 39.8299H126.578C126.578 39.8299 126.77 39.6366 127.16 39.2495C127.543 38.8627 127.785 38.465 127.884 38.0674C127.958 37.6699 128.001 37.3259 128.02 37.0355C128.038 36.7347 128.044 36.5949 128.044 36.5949L128.119 19.7435C127.029 20.0013 126.051 20.6354 125.179 21.6564C124.312 22.6668 123.588 23.6876 123.007 24.7194C122.425 25.7511 122.01 26.5893 121.756 27.2343C121.503 27.89 121.459 27.9542 121.626 27.4276C121.88 28.6206 122.109 30.05 122.32 31.7158C122.524 33.371 122.654 35.3164 122.716 37.5624C122.765 39.7655 122.555 41.8399 122.09 43.7851C121.626 45.7302 121.1 47.4285 120.525 48.9008C119.943 50.3731 119.405 51.5338 118.916 52.3829C118.427 53.2319 118.185 53.6618 118.185 53.6618C118.185 53.6618 118.606 52.4151 119.442 49.922C120.283 47.4391 120.617 44.269 120.45 40.4321C120.376 35.585 119.937 31.7589 119.126 28.9754C118.315 26.1813 117.43 24.0962 116.459 22.7096C115.493 21.3233 114.583 20.4636 113.729 20.1412C112.881 19.8186 112.38 19.6791 112.238 19.7437L112.287 36.5951C112.287 36.5951 112.294 36.7349 112.306 37.0357C112.318 37.3259 112.374 37.6699 112.473 38.0676C112.541 38.4652 112.783 38.8629 113.179 39.2497C113.575 39.6368 113.779 39.8301 113.779 39.8301H108.555C108.555 39.8301 108.63 39.7012 108.772 39.4217C108.921 39.1531 109.094 38.8951 109.298 38.6373C109.49 38.4116 109.608 37.971 109.645 37.3261C109.682 36.692 109.7 36.3696 109.7 36.3696V22.323C109.7 22.323 109.713 22.1188 109.731 21.6997C109.756 21.2804 109.744 20.7969 109.7 20.2488C109.626 19.7222 109.453 19.2493 109.187 18.8194C108.927 18.3894 108.791 18.1745 108.791 18.1745H119.832C119.832 18.1745 119.727 18.3143 119.516 18.5936C119.306 18.8838 119.145 19.2598 119.034 19.7437C118.928 20.2488 118.99 20.7003 119.225 21.0869C119.461 21.4738 119.776 22.0757 120.178 22.8925L120.179 22.8921ZM137 53.6614C137 53.6614 136.753 53.2315 136.257 52.3825C135.762 51.5334 135.224 50.3727 134.642 48.9004C134.067 47.4281 133.547 45.73 133.095 43.7847C132.643 41.8395 132.439 39.7651 132.488 37.562C132.593 33.1555 132.946 29.8239 133.54 27.5672C134.129 25.3103 134.63 23.752 135.026 22.8921C135.41 22.0753 135.725 21.4734 135.96 21.0865C136.195 20.6997 136.257 20.2482 136.152 19.7433C136.041 19.2596 135.88 18.8834 135.67 18.5932C135.459 18.3137 135.354 18.1741 135.354 18.1741H146.414C146.414 18.1741 146.271 18.389 145.993 18.8189C145.714 19.2489 145.553 19.7217 145.504 20.2484C145.436 20.7965 145.417 21.28 145.448 21.6993C145.485 22.1184 145.504 22.3226 145.504 22.3226V36.3692C145.504 36.3692 145.522 36.6916 145.553 37.3257C145.584 37.9706 145.695 38.4112 145.888 38.6369C146.079 38.8947 146.253 39.1527 146.401 39.4213C146.556 39.7008 146.63 39.8297 146.63 39.8297H141.425C141.425 39.8297 141.617 39.6364 142.007 39.2493C142.391 38.8625 142.626 38.4647 142.712 38.0672C142.799 37.6697 142.849 37.3257 142.867 37.0353C142.885 36.7345 142.892 36.5947 142.892 36.5947V29.0073H137.798L138.362 26.9224H142.626V19.7433C142.453 19.6789 141.964 19.8184 141.147 20.1408C140.33 20.4632 139.457 21.3229 138.535 22.7092C137.607 24.0958 136.759 26.1807 135.985 28.975C135.212 31.7585 134.797 35.5846 134.735 40.4316C134.556 44.2684 134.884 47.4387 135.732 49.9216C136.579 52.4149 137 53.6614 137 53.6614H137ZM159.726 39.787C159.893 36.191 159.338 32.585 158.47 28.975C157.792 26.1562 156.842 24.0958 155.92 22.7092C154.998 21.3231 154.125 20.4632 153.308 20.1408C152.491 19.8182 152.015 19.6786 151.866 19.7433L151.94 36.5947L152.101 38.0672C152.138 38.4863 152.367 38.884 152.782 39.2709C153.203 39.6471 153.407 39.8297 153.407 39.8297H147.843C147.843 39.8297 147.917 39.7008 148.06 39.4213C148.208 39.1527 148.381 38.8947 148.586 38.6369C148.778 38.4112 148.895 37.9706 148.932 37.3257C148.969 36.6916 148.982 36.3692 148.982 36.3692V22.3226C148.982 22.3226 148.994 22.1184 149.019 21.6993C149.044 21.28 149.031 20.7965 148.982 20.2484C148.914 19.7217 148.74 19.2489 148.474 18.8189C148.208 18.389 148.078 18.1741 148.078 18.1741H155.387L159.249 20.4417C158.569 20.8392 158.358 21.3229 158.612 21.8818C159.627 24.3 160.419 26.5244 160.988 28.5666C161.558 30.5978 162.076 33.5955 162.003 37.562L161.963 39.7825C161.217 39.784 160.472 39.7856 159.726 39.787H159.726Z" fill="black" stroke="black" stroke-width="2.8424" stroke-miterlimit="2.61313"/>
+<mask id="mask0_3402_681" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="41" y="17" width="122" height="37">
+<path d="M44.8777 31.1459V20.1514C44.8777 20.1514 44.8282 19.915 44.7291 19.4421C44.6364 18.9693 44.4755 18.6682 44.2587 18.5178C44.0297 18.3887 43.8875 18.3136 43.8319 18.2814C43.7824 18.2492 43.7514 18.2383 43.7514 18.2383L44.426 17.8192H53.8145C53.8145 17.8192 54.1735 17.8621 54.8916 17.9374C55.6156 18.0125 56.2407 18.4747 56.7731 19.3346C57.2929 20.2156 57.6332 20.9789 57.7943 21.6237C57.9616 22.2579 58.0418 22.5803 58.0418 22.5803L55.591 25.4713C55.591 25.4713 56.2223 26.213 57.4848 27.6853C58.7535 29.1469 59.4529 30.4368 59.6015 31.5545C59.7438 32.6615 59.5211 33.9189 58.9208 35.3052C58.3205 36.6808 57.3982 37.6481 56.1543 38.1962C53.7714 39.2924 51.2465 39.8727 48.5728 39.9481C45.9055 40.0125 43.5103 39.8296 41.3936 39.3892C42.1673 39.2708 43.1946 39.1097 44.4759 38.9377C45.7569 38.7551 47.063 38.5293 48.3873 38.2393C49.7118 37.9598 50.9309 37.6267 52.0512 37.2399C53.1652 36.8528 53.9451 36.3693 54.3783 35.7996C55.2386 34.6926 55.5604 33.532 55.3562 32.3284C55.152 31.1138 54.8735 30.3186 54.5209 29.9104C54.162 29.5342 53.481 28.7174 52.4849 27.4598C51.4883 26.2023 50.9871 25.5684 50.9871 25.5684L54.9975 23.0535C54.9975 23.0535 54.7128 22.5914 54.1433 21.6779C53.5738 20.7644 52.986 20.27 52.3855 20.1842C51.7668 20.1198 50.8137 20.0981 49.5263 20.1198C48.2389 20.1414 47.5955 20.152 47.5955 20.152V36.8423L44.8785 31.1465L44.8777 31.1459ZM75.284 26.4814C75.8535 30.4688 75.1541 33.7252 73.1796 36.2291C71.2116 38.7333 69.1382 39.8617 66.96 39.6146C65.5488 39.4641 64.2924 38.6473 63.1908 37.1535C62.0891 35.6703 61.4455 33.3383 61.2536 30.1677C61.1175 28.1688 61.3774 25.9764 62.0335 23.5904C62.6832 21.1938 63.0114 20.0008 63.0114 20.0008L62.1759 17.8192C63.1538 17.8192 64.1438 17.8083 65.1404 17.7761C66.1368 17.7439 67.127 17.7761 68.1049 17.8514C69.4477 17.9803 70.7723 18.3994 72.0781 19.098C73.384 19.8075 74.4298 20.968 75.2097 22.6123C75.2097 22.6123 75.1292 22.6338 74.9683 22.6876C74.8074 22.7412 74.6465 22.838 74.4856 22.9885C74.3186 23.1605 74.3867 23.6226 74.696 24.3857C75.0055 25.1596 75.2035 25.8582 75.284 26.4814ZM68.7608 20.4736C67.5726 20.4736 66.5639 21.2798 65.722 22.9134C64.8804 24.5361 64.4595 26.4923 64.4595 28.7814C64.4595 31.0705 64.8804 33.0266 65.722 34.6386C66.5639 36.2507 67.5724 37.0675 68.7608 37.0675C69.9429 37.0675 70.9578 36.2507 71.7933 34.6386C72.6349 33.0266 73.0558 31.0705 73.0558 28.7814C73.0558 26.4923 72.6349 24.5361 71.7933 22.9134C70.9578 21.2798 69.9429 20.4736 68.7608 20.4736ZM80.9593 53.6609C80.9593 53.6609 80.7118 53.231 80.2166 52.382C79.7214 51.5329 79.1831 50.3722 78.6013 48.8999C78.0258 47.4276 77.506 45.7295 77.0541 43.7842C76.6021 41.839 76.3979 39.7646 76.4474 37.5615C76.5525 33.155 76.9055 29.8234 77.4994 27.5667C78.0874 25.3098 78.5888 23.7515 78.9848 22.8916C79.3686 22.0748 79.6843 21.4729 79.9194 21.086C80.1546 20.6992 80.2166 20.2477 80.1113 19.7428C79.9999 19.2591 79.839 18.8829 79.6286 18.5927C79.4183 18.3132 79.313 18.1736 79.313 18.1736H90.3727C90.3727 18.1736 90.2303 18.3885 89.9518 18.8185C89.6733 19.2484 89.5124 19.7213 89.4629 20.2479C89.395 20.796 89.3763 21.2795 89.4071 21.6988C89.4443 22.1179 89.4629 22.3221 89.4629 22.3221V36.3687C89.4629 36.3687 89.4814 36.6911 89.5124 37.3252C89.5432 37.9701 89.6546 38.4107 89.8467 38.6364C90.0386 38.8942 90.2116 39.1522 90.3602 39.4208C90.5149 39.7003 90.5892 39.8292 90.5892 39.8292H85.3844C85.3844 39.8292 85.5763 39.6359 85.9663 39.2488C86.35 38.862 86.5852 38.4643 86.6718 38.0667C86.7584 37.6692 86.8079 37.3252 86.8266 37.0349C86.8453 36.734 86.8514 36.5942 86.8514 36.5942V29.0068H81.7579L82.3212 26.9219H86.5854V19.7428C86.4122 19.6784 85.9232 19.8179 85.1064 20.1403C84.2894 20.4627 83.4167 21.3224 82.4946 22.7088C81.5662 24.0953 80.7184 26.1802 79.9447 28.9745C79.171 31.758 78.7564 35.5841 78.6944 40.4312C78.5151 44.2679 78.843 47.4382 79.6908 49.9211C80.5388 52.4144 80.9595 53.6609 80.9595 53.6609H80.9593ZM92.347 19.8717C92.3841 19.4311 92.2975 19.0227 92.0808 18.6465C91.8705 18.2703 91.7032 18.0017 91.5856 17.8512C91.5856 17.8512 91.9632 17.8512 92.7244 17.8512C93.4856 17.8512 94.3521 17.8512 95.3174 17.8403C96.289 17.8295 97.2111 17.819 98.0962 17.819C98.9752 17.819 99.5384 17.8297 99.7797 17.8512C101.123 17.9801 102.447 18.3992 103.753 19.0978C105.053 19.8072 106.099 20.9678 106.885 22.6121C106.885 22.6121 106.804 22.6336 106.643 22.6874C106.482 22.741 106.322 22.8378 106.161 22.9883C105.994 23.1603 106.062 23.6224 106.371 24.3855C106.68 25.1594 106.872 25.858 106.959 26.4812C107.312 29.0176 107.2 31.1456 106.625 32.8544C106.049 34.5738 105.257 35.9389 104.242 36.9491C103.227 37.9701 102.107 38.6687 100.894 39.0662C99.6806 39.453 98.6163 39.5819 97.694 39.453C96.9451 39.3886 95.7443 39.3886 94.092 39.453C92.4457 39.5175 91.6227 39.5497 91.6227 39.5497C91.6227 39.5497 91.6351 39.5606 91.6537 39.5606C91.6784 39.5715 91.7775 39.4424 91.9445 39.1737C92.1054 38.916 92.2107 38.5182 92.2663 37.981C92.3158 37.4328 92.3468 37.1533 92.3468 37.1533V19.8719L92.347 19.8717ZM95.7014 20.3123V37.3468C95.7014 37.3468 96.4626 37.3361 97.9914 37.3146C99.5199 37.2932 100.479 37.0782 100.869 36.6484C101.253 36.2507 101.841 35.4985 102.627 34.3913C103.413 33.2737 103.754 31.3498 103.642 28.6201C103.475 24.5683 102.646 22.0857 101.166 21.1507C99.6874 20.2156 97.8617 19.9361 95.7016 20.3123H95.7014ZM120.179 22.8916C120.432 22.3865 120.55 22.1501 120.538 22.1717C121.856 19.9041 123.583 18.668 125.705 18.4747C127.834 18.2705 129.79 18.1738 131.566 18.1738C131.566 18.1738 131.424 18.3887 131.145 18.8187C130.867 19.2486 130.706 19.7215 130.656 20.2481C130.595 20.7962 130.582 21.2798 130.613 21.699C130.644 22.1181 130.656 22.3223 130.656 22.3223V36.3689C130.656 36.3689 130.675 36.6913 130.706 37.3255C130.731 37.9703 130.854 38.4109 131.059 38.6367C131.251 38.8944 131.418 39.1524 131.566 39.421C131.708 39.7006 131.783 39.8294 131.783 39.8294H126.578C126.578 39.8294 126.77 39.6361 127.16 39.2491C127.543 38.8622 127.785 38.4645 127.884 38.0669C127.958 37.6694 128.001 37.3255 128.02 37.0351C128.038 36.7342 128.044 36.5944 128.044 36.5944L128.119 19.743C127.029 20.0008 126.051 20.6349 125.179 21.6559C124.312 22.6663 123.588 23.6871 123.007 24.719C122.425 25.7506 122.01 26.5888 121.756 27.2338C121.503 27.8895 121.459 27.9537 121.626 27.4271C121.88 28.6201 122.109 30.0495 122.32 31.7154C122.524 33.3705 122.654 35.3159 122.716 37.5619C122.765 39.765 122.555 41.8394 122.09 43.7846C121.626 45.7297 121.1 47.428 120.525 48.9003C119.943 50.3726 119.405 51.5333 118.916 52.3824C118.427 53.2314 118.185 53.6613 118.185 53.6613C118.185 53.6613 118.606 52.4146 119.442 49.9215C120.283 47.4386 120.617 44.2685 120.45 40.4316C120.376 35.5845 119.937 31.7585 119.126 28.975C118.315 26.1808 117.43 24.0957 116.459 22.7092C115.493 21.3228 114.583 20.4632 113.729 20.1407C112.881 19.8181 112.38 19.6786 112.238 19.7432L112.287 36.5946C112.287 36.5946 112.294 36.7344 112.306 37.0353C112.318 37.3255 112.374 37.6694 112.473 38.0671C112.541 38.4647 112.783 38.8624 113.179 39.2493C113.575 39.6363 113.779 39.8296 113.779 39.8296H108.555C108.555 39.8296 108.63 39.7008 108.772 39.4212C108.921 39.1526 109.094 38.8946 109.298 38.6369C109.49 38.4111 109.608 37.9705 109.645 37.3257C109.682 36.6915 109.7 36.3691 109.7 36.3691V22.3225C109.7 22.3225 109.713 22.1183 109.731 21.6992C109.756 21.28 109.744 20.7964 109.7 20.2483C109.626 19.7217 109.453 19.2488 109.187 18.8189C108.927 18.3889 108.791 18.174 108.791 18.174H119.832C119.832 18.174 119.727 18.3138 119.516 18.5931C119.306 18.8833 119.145 19.2593 119.034 19.7432C118.928 20.2483 118.99 20.6998 119.225 21.0864C119.461 21.4733 119.776 22.0752 120.178 22.892L120.179 22.8916ZM137 53.6609C137 53.6609 136.753 53.231 136.257 52.382C135.762 51.5329 135.224 50.3722 134.642 48.8999C134.067 47.4276 133.547 45.7295 133.095 43.7842C132.643 41.839 132.439 39.7646 132.488 37.5615C132.593 33.155 132.946 29.8234 133.54 27.5667C134.129 25.3098 134.63 23.7515 135.026 22.8916C135.41 22.0748 135.725 21.4729 135.96 21.086C136.195 20.6992 136.257 20.2477 136.152 19.7428C136.041 19.2591 135.88 18.8829 135.67 18.5927C135.459 18.3132 135.354 18.1736 135.354 18.1736H146.414C146.414 18.1736 146.271 18.3885 145.993 18.8185C145.714 19.2484 145.553 19.7213 145.504 20.2479C145.436 20.796 145.417 21.2795 145.448 21.6988C145.485 22.1179 145.504 22.3221 145.504 22.3221V36.3687C145.504 36.3687 145.522 36.6911 145.553 37.3252C145.584 37.9701 145.695 38.4107 145.888 38.6364C146.079 38.8942 146.253 39.1522 146.401 39.4208C146.556 39.7003 146.63 39.8292 146.63 39.8292H141.425C141.425 39.8292 141.617 39.6359 142.007 39.2488C142.391 38.862 142.626 38.4643 142.712 38.0667C142.799 37.6692 142.849 37.3252 142.867 37.0349C142.885 36.734 142.892 36.5942 142.892 36.5942V29.0068H137.798L138.362 26.9219H142.626V19.7428C142.453 19.6784 141.964 19.8179 141.147 20.1403C140.33 20.4627 139.457 21.3224 138.535 22.7088C137.607 24.0953 136.759 26.1802 135.985 28.9745C135.212 31.758 134.797 35.5841 134.735 40.4312C134.556 44.2679 134.884 47.4382 135.732 49.9211C136.579 52.4144 137 53.6609 137 53.6609H137ZM159.788 39.6964C159.902 36.2587 159.42 32.6742 158.47 28.9748C157.749 26.1666 156.842 24.0955 155.92 22.709C154.998 21.3228 154.125 20.4629 153.308 20.1405C152.491 19.8179 152.015 19.6784 151.866 19.743L151.94 36.5944L152.101 38.0669C152.138 38.486 152.367 38.8837 152.782 39.2706C153.203 39.6468 153.407 39.8294 153.407 39.8294H147.843C147.843 39.8294 147.917 39.7006 148.06 39.421C148.208 39.1524 148.381 38.8944 148.586 38.6367C148.778 38.4109 148.895 37.9703 148.932 37.3255C148.969 36.6913 148.982 36.3689 148.982 36.3689V22.3223C148.982 22.3223 148.994 22.1181 149.019 21.699C149.044 21.2798 149.031 20.7962 148.982 20.2481C148.914 19.7215 148.74 19.2486 148.474 18.8187C148.208 18.3887 148.078 18.1738 148.078 18.1738H155.387L159.249 20.4414C158.569 20.8389 158.358 21.3226 158.612 21.8815C159.627 24.2997 160.419 26.5241 160.988 28.5663C161.558 30.5975 162.075 33.5952 162.003 37.5617L161.963 39.7769C161.238 39.75 160.513 39.7233 159.787 39.6964H159.788Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_3402_681)">
+<path d="M167.371 -2.75488H35.8916V57.9811H167.371V-2.75488Z" fill="url(#paint0_linear_3402_681)"/>
+</g>
+</g>
+<g clip-path="url(#clip1_3402_681)">
+<path d="M2.83717 19.2965L3.79679 22.8271L27.2711 23.1553L28.2307 19.2965C27.3594 19.6028 25.3695 19.4967 25.7959 20.1779C27.0466 22.1757 25.2857 22.3474 24.9807 22.4632C12.2274 27.3056 17.5453 25.1555 19.2417 4.4929L17.9744 3.50263L15.534 1.5957L13.9245 2.85338L11.8261 4.4929C13.657 26.7911 19.8586 25.2833 2.83731 19.2965H2.83717ZM19.7283 10.8423C19.8322 10.89 19.9347 10.9379 20.0356 10.9859L20.0737 11.004C20.1564 11.0436 20.2381 11.0834 20.3188 11.1232L20.4321 11.1796L20.4661 11.1967L20.4999 11.2138L20.5337 11.231L20.5365 11.2325C26.7938 14.4047 27.3455 18.4873 27.3455 18.4873C26.0582 19.1372 26.6344 27.3873 25.5791 27.9412C13.3431 34.3636 14.411 26.3329 19.7285 10.8423H19.7283ZM27.2803 23.9192L28.1181 27.7964L26.3584 34.2614L26.3155 35.8057L29.7357 43.5435C29.9379 44.2431 29.7203 44.9702 29.1744 45.4063L19.2592 53.3237H11.8086L1.89348 45.4063C1.34742 44.9702 1.13007 44.2431 1.33216 43.5435L4.75226 35.8057L4.7093 34.2614L2.94946 27.7964L3.78729 23.9192H3.78742H27.28H27.2803ZM11.3396 10.8423C11.2356 10.89 11.1333 10.9379 11.0323 10.9859L10.9943 11.004C10.9116 11.0436 10.83 11.0834 10.7491 11.1232L10.6359 11.1796L10.6019 11.1967L10.5681 11.2138L10.5342 11.231L10.5226 11.2369C4.27366 14.4086 3.72238 18.4873 3.72238 18.4873C13.5785 30.3859 24.3135 20.0928 11.3394 10.8422L11.3396 10.8423Z" fill="black" stroke="#FF5733" stroke-width="2.51549" stroke-miterlimit="2.61313"/>
+<path d="M2.83717 19.2965L3.79679 22.8271L27.2711 23.1553L28.2307 19.2965C27.3594 19.6028 25.3695 19.4967 25.7959 20.1779C27.0466 22.1757 25.2857 22.3474 24.9807 22.4632C12.2274 27.3056 17.5453 25.1555 19.2417 4.4929L17.9744 3.50263L15.534 1.5957L13.9245 2.85338L11.8261 4.4929C13.657 26.7911 19.8586 25.2833 2.83731 19.2965H2.83717ZM19.7283 10.8423C19.8322 10.89 19.9347 10.9379 20.0356 10.9859L20.0737 11.004C20.1564 11.0436 20.2381 11.0834 20.3188 11.1232L20.4321 11.1796L20.4661 11.1967L20.4999 11.2138L20.5337 11.231L20.5365 11.2325C26.7938 14.4047 27.3455 18.4873 27.3455 18.4873C26.0582 19.1372 26.6344 27.3873 25.5791 27.9412C13.3431 34.3636 14.411 26.3329 19.7285 10.8423H19.7283ZM27.2803 23.9192L28.1181 27.7964L26.3584 34.2614L26.3155 35.8057L29.7357 43.5435C29.9379 44.2431 29.7203 44.9702 29.1744 45.4063L19.2592 53.3237H11.8086L1.89348 45.4063C1.34742 44.9702 1.13007 44.2431 1.33216 43.5435L4.75226 35.8057L4.7093 34.2614L2.94946 27.7964L3.78729 23.9192H3.78742H27.28H27.2803ZM11.3396 10.8423C11.2356 10.89 11.1333 10.9379 11.0323 10.9859L10.9943 11.004C10.9116 11.0436 10.83 11.0834 10.7491 11.1232L10.6359 11.1796L10.6019 11.1967L10.5681 11.2138L10.5342 11.231L10.5226 11.2369C4.27366 14.4086 3.72238 18.4873 3.72238 18.4873C13.5785 30.3859 24.3135 20.0928 11.3394 10.8422L11.3396 10.8423Z" fill="black" stroke="black" stroke-width="1.43742" stroke-miterlimit="2.61313"/>
+<path d="M2.83691 19.2964L3.79653 22.1694L15.5337 25.8468V23.7623L2.83691 19.2964Z" fill="#EFEFF0"/>
+<path d="M3.78735 23.9191L2.94952 27.7962L4.70936 34.2613L6.98634 36.3328L4.75232 35.8055L1.33222 43.5434C1.12999 44.2429 1.34748 44.9701 1.89354 45.4061L11.8087 53.3236L11.8776 49.748L4.08059 42.6173L11.907 48.2169L11.9701 44.95L8.60793 41.9858C8.57166 41.9538 8.53592 41.9212 8.50086 41.8883C4.90958 38.5193 11.1175 33.6486 11.1177 33.6484C11.1177 33.6484 5.96436 31.1991 6.54093 27.3172C6.54093 27.3172 14.3179 29.2913 14.4955 37.6764L12.6179 41.41L15.5342 44.0367V27.6686L3.78775 23.9189L3.78735 23.9191Z" fill="#EFEFF0"/>
+<path d="M13.9236 2.85338L14.182 6.69561L13.0926 3.50263L11.8252 4.4929L13.1551 20.6903L15.5332 23.7622V1.5957L13.9236 2.85338Z" fill="#EFEFF0"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M13.9238 2.85338L14.1821 6.69561L13.0928 3.50263L14.2184 20.0342L15.5333 23.7622V1.5957L13.9238 2.85338Z" fill="#D2CFD7"/>
+<path d="M3.78705 23.9191L2.94922 27.7962L4.70906 34.2613L6.98604 36.3328C3.55631 28.4899 6.31498 25.9831 6.31498 25.9831C16.7534 27.5489 15.2622 38.1364 15.2622 38.1364L14.3675 40.8951L15.5335 44.0367V27.6686L3.78705 23.9189V23.9191Z" fill="#BAB6C1"/>
+<path d="M11.9075 48.2172L11.9422 46.4153L4.08105 42.6177L11.9075 48.2172Z" fill="url(#paint1_linear_3402_681)"/>
+<path d="M11.3395 10.8423L11.9715 20.2575L12.8635 21.8647L3.72266 18.4874C3.72266 18.4874 4.32011 14.0584 11.3397 10.8423H11.3395Z" fill="#EFEFF0"/>
+<path d="M12.8639 21.8642L11.9719 20.257L11.3399 10.8418C10.5641 11.1973 9.8709 11.568 9.24414 11.9456L9.67644 19.673L12.8638 21.8642H12.8639Z" fill="#BAB6C1"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5337 25.8468L2.83691 19.2964L15.5337 23.7623V25.8468Z" fill="#D2CFD7"/>
+<path d="M28.2309 19.2964L27.2712 22.1694L15.5342 25.8468V23.7623L28.2309 19.2964Z" fill="#EFEFF0"/>
+<path d="M27.2806 23.9191L28.1184 27.7962L26.3587 34.2613L24.0818 36.3328L26.3158 35.8055L29.7359 43.5434C29.9381 44.2429 29.7206 44.9701 29.1747 45.4061L19.2596 53.3236L19.1906 49.748L26.9876 42.6173L19.1611 48.2169L19.0982 44.95L22.4603 41.9858C22.4966 41.9538 22.5323 41.9212 22.5675 41.8883C26.1588 38.5193 19.9508 33.6486 19.9507 33.6484C19.9507 33.6484 25.104 31.1991 24.5276 27.3172C24.5276 27.3172 16.7506 29.2913 16.5729 37.6764L18.4504 41.41L15.5342 44.0367V27.6686L27.2805 23.9189L27.2806 23.9191Z" fill="#EFEFF0"/>
+<path d="M17.1437 2.85338L16.8854 6.69561L17.9746 3.50263L19.2419 4.4929L17.9121 20.6903L15.5342 23.7622V1.5957L17.1437 2.85338Z" fill="#EFEFF0"/>
+<path d="M17.1437 2.85338L16.8854 6.69561L17.9746 3.50263L16.849 20.0342L15.5342 23.7622V1.5957L17.1437 2.85338Z" fill="#BAB6C1"/>
+<path d="M27.2805 23.9191L28.1183 27.7962L26.3586 34.2613L24.0816 36.3328C27.5115 28.4899 24.7525 25.9831 24.7525 25.9831C14.3142 27.5489 15.8053 38.1364 15.8053 38.1364L16.7 40.8951L15.5342 44.0367V27.6686L27.2805 23.9189V23.9191Z" fill="#BAB6C1"/>
+<path d="M19.728 10.8423L19.0961 20.2575L18.2041 21.8647L27.345 18.4874C27.345 18.4874 26.7475 14.0584 19.728 10.8423Z" fill="#EFEFF0"/>
+<path d="M18.2041 21.8642L19.0961 20.257L19.728 10.8418C20.5038 11.1973 21.197 11.568 21.8238 11.9456L21.3915 19.673L18.2041 21.8642Z" fill="#BAB6C1"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5342 25.8468L28.2309 19.2964L15.5342 23.7623V25.8468Z" fill="#D2CFD7"/>
+<path d="M23.2704 28.7852C21.3805 29.0504 19.0637 30.6828 17.9473 33.246C19.9511 33.6484 23.2821 31.3292 23.2704 28.7852Z" fill="#FF5733"/>
+<path d="M7.45804 28.7852C9.34797 29.0504 11.6648 30.6828 12.7812 33.246C10.7774 33.6484 7.44639 31.3292 7.45804 28.7852Z" fill="#FF5733"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_3402_681" x1="101.631" y1="-1.54014" x2="101.631" y2="56.7664" gradientUnits="userSpaceOnUse">
+<stop stop-color="white"/>
+<stop offset="0.439216" stop-color="#FEFEFE"/>
+<stop offset="0.509804" stop-color="#FEFEFE"/>
+<stop offset="0.521569" stop-color="#E1E0E7"/>
+<stop offset="0.678431" stop-color="#EFEEF2"/>
+<stop offset="0.921569" stop-color="#FEFEFE"/>
+<stop offset="1" stop-color="#FEFEFE"/>
+</linearGradient>
+<linearGradient id="paint1_linear_3402_681" x1="7.24352" y1="49.1976" x2="10.6526" y2="32.4219" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FFA700"/>
+<stop offset="0.541176" stop-color="#FF3F00"/>
+<stop offset="1" stop-color="#A30300"/>
+</linearGradient>
+<clipPath id="clip0_3402_681">
+<rect width="124.832" height="38.8799" fill="white" transform="translate(39.1689 15.7754)"/>
+</clipPath>
+<clipPath id="clip1_3402_681">
+<rect width="31.0676" height="54.582" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#money-path">Money path</a>
+      <a href="#board">Competitions</a>
+      <a href="#brands">Brands</a>
+      <a href="#publishers">Publishers</a>
+      <a href="/faqs">FAQs</a>
+    </nav>
+    <div class="header__cta">
+      <a class="btn btn--ghost btn--sm" href="/signin">Sign in</a>
+      <a class="btn btn--primary btn--sm" href="/signup">Create account</a>
+    </div>
+    <button class="menu-btn" type="button" id="menuBtn" aria-expanded="false" aria-controls="menuPanel">Menu</button>
+  </div>
+  <div class="menu-panel on-ink" id="menuPanel" data-open="false">
+    <div class="wrap">
+      <ul>
+        <li><a href="#money-path">Money path</a></li>
+        <li><a href="#board">Competitions</a></li>
+        <li><a href="#brands">Brands</a></li>
+        <li><a href="#publishers">Publishers</a></li>
+        <li><a href="/faqs">FAQs</a></li>
+      </ul>
+      <div class="btn-row">
+        <a class="btn btn--primary" href="/signup">Create account</a>
+        <a class="btn btn--ghost" href="/signin">Sign in</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================= HERO ================= -->
+  <section class="hero on-ink" aria-labelledby="hero-h">
+    <div class="hero__text">
+      <h1 class="h1" id="hero-h" style="--i:0">You play the match.<br><span class="flame">Boadman holds the pot.</span></h1>
+      <p class="lede" style="--i:1">Stake coins in 1v1 challenges and tournaments. The match result decides who takes the pot.</p>
+      <div class="btn-row" style="--i:2">
+        <a class="btn btn--primary" href="/signup">Create account</a>
+        <a class="btn btn--ghost" href="#money-path">The money path</a>
+      </div>
+    </div>
+
+    <div class="hero__bar field-acid on-acid">
+      <div class="compliance">
+        <span><b>18+ only.</b></span>
+        <span>Coins are bought with real money. 1 coin costs 10p, and commission is deducted when a competition settles.</span>
+        <span>Lose the match and your stake goes to the winner. <a class="link" href="/legal/terms">Terms</a></span>
+      </div>
+    </div>
+
+    <figure class="art hero__art ph-hero">
+      <!-- IMAGE-SLOT id="hero-field" ratio="21:9" px="2520x1080" prompt="Abstract wide artwork for a competitive gaming platform, bright and high energy. A dense stack of unequal horizontal bars made of thick coloured glass laid flat across a bone white plane and lit from behind so each bar glows through its own colour. The bars run left to right, shortest at the top, lengthening as they descend, and the lowest three streak into horizontal motion blur at the right edge. Hard studio key light from the upper left, crisp shadow edges, fine paper grain over the whole frame, flat graphic clarity with no atmospheric haze and no glow bloom. Palette strictly bone white #ECEEF2 and #F7F8FA for the ground, electric ultramarine #2436E0 for most of the bars, hot orange #FF4A1C for two bars, acid yellow green #DDF247 for one thin sliver, near black #0E1016 for the shadows only. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="hero-field" src="./generated/three--hero-field.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+    </figure>
+  </section>
+
+  <!-- ================= MONEY PATH ================= -->
+  <section class="section" id="money-path" aria-labelledby="path-h">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2 class="h2" id="path-h">Six moves. The balance is spendable in two of them.</h2>
+        <p class="lede dim">Money in a competition is nearly always in someone else's hands, including ours. Here is every stage, and what stops it at each one.</p>
+        <ul class="legend">
+          <li><span class="chip chip--spendable">Spendable</span></li>
+          <li><span class="chip chip--committed">Committed</span></li>
+          <li><span class="chip chip--held">Held</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wrap rail-wrap reveal">
+      <div class="rail" id="rail" tabindex="0" role="group" aria-label="The money path, six stages, scrollable">
+
+        <article class="step">
+          <div class="step__top">
+            <h3 class="step__verb">Buy</h3>
+            <span class="chip chip--spendable">Spendable</span>
+          </div>
+          <p class="step__fact">You buy coins with a card and they land in your wallet. 1 coin costs 10p.</p>
+          <p class="step__stop">Card payments are switched off while processor approval is outstanding, so no coins are being sold today.</p>
+        </article>
+
+        <article class="step">
+          <div class="step__top">
+            <h3 class="step__verb">Enter</h3>
+            <span class="chip chip--committed">Committed</span>
+          </div>
+          <p class="step__fact">Entering a competition moves the stake out of your wallet straight away.</p>
+          <p class="step__stop">From that moment you cannot spend it, withdraw it or stake it anywhere else.</p>
+        </article>
+
+        <article class="step">
+          <div class="step__top">
+            <h3 class="step__verb">Play</h3>
+            <span class="chip chip--held">Held</span>
+          </div>
+          <p class="step__fact">The match happens in the game itself. Boadman does not run the game. It holds both stakes and records the result.</p>
+          <p class="step__stop">Neither player can reach the pot while the match is running.</p>
+        </article>
+
+        <article class="step">
+          <div class="step__top">
+            <h3 class="step__verb">Settle</h3>
+            <span class="chip chip--committed">Committed</span>
+          </div>
+          <p class="step__fact">The pot pays the winner, and commission is taken out of it first.</p>
+          <p class="step__stop">The losing stake is gone. It pays the winner and is not returned.</p>
+        </article>
+
+        <article class="step">
+          <div class="step__top">
+            <h3 class="step__verb">Mature</h3>
+            <span class="chip chip--held">Held</span>
+          </div>
+          <p class="step__fact">A prize is held for 48 hours after settlement, then matures on its own.</p>
+          <p class="step__stop">Another entrant can raise a complaint inside that window and the prize freezes until an admin rules.</p>
+        </article>
+
+        <article class="step">
+          <div class="step__top">
+            <h3 class="step__verb">Cash out</h3>
+            <span class="chip chip--spendable">Spendable</span>
+          </div>
+          <p class="step__fact">Money goes to a bank account in the same legal name as the Boadman account.</p>
+          <p class="step__stop">A name that does not match is not paid. Identity checks and money laundering reviews can hold it.</p>
+        </article>
+
+      </div>
+
+      <div class="rail-ctl">
+        <button type="button" id="railPrev" aria-controls="rail" aria-label="Show earlier stages">&lsaquo;</button>
+        <button type="button" id="railNext" aria-controls="rail" aria-label="Show later stages">&rsaquo;</button>
+        <p class="rail-note dim">Every stage above is set out in the <a class="link" href="/legal/terms">Terms</a>.</p>
+      </div>
+
+      <figure class="art art--path ph-path">
+        <!-- IMAGE-SLOT id="path-material" ratio="21:9" px="2520x1080" prompt="Abstract wide macro photograph of six solid anodised aluminium blocks clamped in a row along one straight machined steel rail, seen slightly from above and to the left so the rail runs in perspective from lower left to upper right. Each block is a different flat saturated colour in this fixed order from left to right: acid yellow green #DDF247, hot orange #FF4A1C, electric ultramarine #2436E0, hot orange #FF4A1C, electric ultramarine #2436E0, acid yellow green #DDF247. Brushed metal rail in near black #0E1016 crossing one continuous unbroken bone white #ECEEF2 paper sweep, one hard raking light source, sharp micro reflections on the anodised edges, shallow depth of field falling away at the far end of the rail. Industrial, precise, tactile, product photography discipline. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="path-material" src="./generated/three--path-material.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ================= BOARD ================= -->
+  <section class="section" id="board" aria-label="Competitions">
+    <div class="wrap">
+      <div class="board-grid">
+
+        <figure class="art art--board ph-board reveal">
+          <!-- IMAGE-SLOT id="board-empty" ratio="16:9" px="2400x1350" prompt="Abstract wide artwork of an empty display wall: a clean grid of nine identical recessed rectangular slots milled into one continuous bone white #F7F8FA panel, three rows by three columns, every slot empty and evenly lit so the wall reads as calm and finished rather than broken or abandoned. Soft top light, gentle interior shadow inside each recess, one slot in the middle row catching a single thin hot orange #FF4A1C line along its lower lip and nothing else. Matte plaster surface with very fine grain, near black #0E1016 present only in the deepest shadow, faint cool grey #C9CEDA falloff toward the frame edges. Composed, quiet, architectural, generous negative space. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="board-empty" src="./generated/three--board-empty.jpg" alt="" width="2400" height="1350" loading="lazy" decoding="async">
+        </figure>
+
+        <div class="reveal" style="--i:1">
+
+          <!-- ---- EMPTY: the production state today ---- -->
+          <div class="board-state board-state--empty">
+            <h2 class="h2">Nothing is open to enter.</h2>
+            <div class="stack" style="margin-top:1.2rem">
+              <p class="lede">No publisher has licensed a title to Boadman yet. A publisher licence is the only way a game can be competed on here, so the board stays empty until one signs.</p>
+              <p class="small dim">When competitions do open, entering one moves your stake out of your wallet and a lost stake is not returned. <a class="link" href="/legal/terms">Terms</a></p>
+              <div class="btn-row" style="margin-top:.4rem">
+                <a class="btn btn--primary" href="/signup">Create account</a>
+                <a class="btn btn--ghost" href="/waitlist/publishers">Join the publisher waitlist</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---- LOADING: the feed is slow. Skeletons match the card shape. ---- -->
+          <div class="board-state board-state--loading">
+            <h2 class="h2">Loading the board.</h2>
+            <p class="lede" style="margin-top:1.2rem">The competitions feed is answering.</p>
+            <div class="cards" style="margin-top:1.6rem" aria-hidden="true">
+              <div class="skel">
+                <div class="skel__plate"></div>
+                <div class="skel__line" style="--w:46%;--i:0"></div>
+                <div class="skel__line" style="--w:88%;--i:1"></div>
+                <div class="skel__line" style="--w:74%;--i:2"></div>
+                <div class="skel__line" style="--w:82%;--i:3"></div>
+                <div class="skel__btn"></div>
+              </div>
+              <div class="skel">
+                <div class="skel__plate"></div>
+                <div class="skel__line" style="--w:52%;--i:1"></div>
+                <div class="skel__line" style="--w:80%;--i:2"></div>
+                <div class="skel__line" style="--w:69%;--i:3"></div>
+                <div class="skel__line" style="--w:86%;--i:4"></div>
+                <div class="skel__btn"></div>
+              </div>
+            </div>
+            <p class="small dim" style="margin-top:1rem" role="status">Loading competitions.</p>
+          </div>
+
+          <!-- ---- ERROR: feed failed. Show nothing rather than a wrong board. ---- -->
+          <div class="board-state board-state--error">
+            <h2 class="h2">The board did not answer.</h2>
+            <div class="stack" style="margin-top:1.2rem">
+              <div class="notice">
+                <p>The competitions feed failed. Nothing is listed rather than a board that might be wrong about prize pools or entry fees.</p>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn--primary" type="button" id="retryBtn">Try again</button>
+                <a class="btn btn--ghost" href="/faqs">Read the FAQs</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---- OPEN: sample data. Never shipped as real. ---- -->
+          <div class="board-state board-state--open">
+            <h2 class="h2">Open to enter.<span class="tag-sample">sample</span></h2>
+            <p class="lede" style="margin:1.2rem 0 1.6rem">Every figure below comes from the competitions feed. A prize pool is what the winner draws from before commission, not what they receive.</p>
+
+            <!-- sample data, review rig only -->
+            <div class="cards">
+              <article class="card">
+                <div class="card__plate"><span>No cover art. No title is licensed.</span></div>
+                <div class="card__body">
+                  <span class="chip chip--committed" style="align-self:flex-start">Live</span>
+                  <h3 class="card__title">Friday night ladder</h3>
+                  <dl class="card__rows">
+                    <div class="card__row"><dt>Game</dt><dd style="font-family:inherit">Chess</dd></div>
+                    <div class="card__row"><dt>Host</dt><dd style="font-family:inherit">Boadman, platform</dd></div>
+                    <div class="card__row"><dt>Prize pool</dt><dd>1,250,000 coins</dd></div>
+                    <div class="card__row"><dt>Host put up</dt><dd>250,000 coins</dd></div>
+                    <div class="card__row"><dt>Entry</dt><dd>500 coins</dd></div>
+                    <div class="card__row"><dt>Entrants</dt><dd>128 / 256</dd></div>
+                  </dl>
+                  <a class="btn btn--primary btn--sm" href="/p/tournament/1">View competition</a>
+                </div>
+              </article>
+
+              <article class="card">
+                <div class="card__plate"><span>No cover art. No title is licensed.</span></div>
+                <div class="card__body">
+                  <span class="chip chip--held" style="align-self:flex-start">Starting soon</span>
+                  <h3 class="card__title">Open bracket, fighting</h3>
+                  <dl class="card__rows">
+                    <div class="card__row"><dt>Game</dt><dd style="font-family:inherit">Not listed</dd></div>
+                    <div class="card__row"><dt>Host</dt><dd style="font-family:inherit">Player hosted</dd></div>
+                    <div class="card__row"><dt>Prize pool</dt><dd>8,000 coins</dd></div>
+                    <div class="card__row"><dt>Host put up</dt><dd>8,000 coins</dd></div>
+                    <div class="card__row"><dt>Entry</dt><dd>Free entry</dd></div>
+                    <div class="card__row"><dt>Entrants</dt><dd>12 / 32</dd></div>
+                  </dl>
+                  <a class="btn btn--primary btn--sm" href="/p/tournament/2">View competition</a>
+                </div>
+              </article>
+            </div>
+
+            <p class="small dim" style="margin-top:1.1rem">Entering moves your stake out of your wallet immediately, and a stake is lost when you lose. Commission comes out of the pot at settlement. <a class="link" href="/legal/terms">Terms</a></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- COUNTERS: absent by default, because absent is what the page
+             must survive. The whole block is removed, not zeroed. ---- -->
+      <div class="counters-block" style="margin-top:clamp(34px,4vw,60px)">
+        <div class="counters reveal">
+          <!-- sample data, review rig only -->
+          <div class="counter"><p class="counter__v is-unreported">Not reported</p><p class="counter__l">Tournaments live</p></div>
+          <div class="counter"><p class="counter__v">3.8k</p><p class="counter__l">Active players, last 30 days</p></div>
+          <div class="counter"><p class="counter__v">&pound;1.5k</p><p class="counter__l">Prizes paid, last 30 days</p></div>
+          <div class="counter"><p class="counter__v is-unreported">Not reported</p><p class="counter__l">Supported games</p></div>
+        </div>
+        <p class="counters-note">A zero from this feed can mean a quiet platform or a partly failed query, and the two look identical, so a zero is printed as not reported rather than as a number. <span class="tag-sample">sample</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 48 HOUR HOLD ================= -->
+  <section class="section--flush field-ultra on-ultra" id="hold" aria-labelledby="hold-h">
+    <div class="hold">
+      <figure class="art art--hold ph-hold">
+        <!-- IMAGE-SLOT id="hold-48" ratio="4:3" px="1800x1350" prompt="Abstract macro photograph of a thick slab of clear cast resin standing upright on a bone white #ECEEF2 surface, with one solid cube of hot orange #FF4A1C suspended motionless deep inside the slab. The resin is tinted electric ultramarine #2436E0 toward its outer edges and stays clear at the centre, so the cube reads as held in place and out of reach. Cold directional light from the left, caustic refraction lines cast across the white surface below, one crisp specular highlight down the front face, near black #0E1016 only in the deepest internal shadow. Still, cold, precise, high clarity, shallow depth of field. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="hold-48" src="./generated/three--hold-48.jpg" alt="" width="1800" height="1350" loading="lazy" decoding="async">
+      </figure>
+
+      <div class="hold__body">
+        <div class="reveal">
+          <div class="bignum-row">
+            <span class="bignum">48</span>
+            <p>hours between winning<br>and spending</p>
+          </div>
+          <h2 class="h2" id="hold-h" style="margin-top:1.6rem">A prize sits still before it is yours to move.</h2>
+
+          <div class="timeline" id="timeline">
+            <div class="timeline__track"><div class="timeline__fill"></div></div>
+            <div class="timeline__ends"><span>Settled, held</span><span>Matured, spendable</span></div>
+          </div>
+        </div>
+
+        <div class="pair reveal" style="--i:1">
+          <div>
+            <span class="chip chip--held">Held for 48 hours</span>
+            <p>A prize is held for 48 hours after a competition settles. Nobody has to approve it. When the window closes it matures on its own and becomes spendable.</p>
+          </div>
+          <div>
+            <span class="chip chip--committed">Frozen until an admin rules</span>
+            <p>Another entrant can raise a complaint about cheating inside those 48 hours. The prize freezes until an admin rules on it, and a complaint judged frivolous carries a fee taken from whoever filed it.</p>
+          </div>
+        </div>
+
+        <p class="small dim reveal" style="--i:2;margin-top:1.4rem">Holds, complaints and dispute fees are set out in the <a class="link" href="/legal/terms">Terms</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= COMMISSION ================= -->
+  <section class="field-flame on-flame" id="commission" aria-labelledby="rates-h">
+    <figure class="art art--rates ph-rates">
+      <!-- IMAGE-SLOT id="rates-band" ratio="21:9" px="2520x1080" prompt="Abstract wide macro photograph of one straight groove machined across a flat hot orange #FF4A1C anodised metal plate, the groove running the full width of the frame and tilted very slightly off horizontal. A thin continuous ribbon of the same orange material has been lifted clear of the groove and curls away above the plate, catching a hard raking light from the right. Sharp burr detail along both edges of the cut, bone white #ECEEF2 backdrop visible through the gap in the plate, near black #0E1016 shadow inside the groove itself. Clean industrial still life, very high saturation, crisp focus, no atmosphere and no haze. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="rates-band" src="./generated/three--rates-band.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+    </figure>
+
+    <div class="wrap rates__body">
+      <div class="rates__grid">
+        <div class="reveal">
+          <h2 class="h2" id="rates-h">Commission comes out of every settled pot.</h2>
+          <p class="lede" style="margin-top:1.1rem">A prize is always smaller than the pool it came from. The deduction happens at settlement, before the winner is paid, on every competition that settles.</p>
+        </div>
+
+        <div class="reveal" style="--i:1">
+          <div class="ratebox rate-fallback">
+            <p style="font-weight:750">The rate is set by Boadman and can change, so no rate is printed here. The figure that applies to a competition is the one held on the server at the moment it settles.</p>
+          </div>
+
+          <div class="ratebox rate-readable">
+            <!-- sample data, review rig only -->
+            <p class="mono">12%</p>
+            <p style="font-weight:700;margin-top:.5rem">of the settled pot. <span class="tag-sample">sample</span></p>
+            <p class="small" style="margin-top:.5rem">This figure is server configured and can change, so it is not a fixed rate and it is not a quote.</p>
+          </div>
+
+          <p class="small" style="margin-top:.9rem;font-weight:600">Commission, host fees and dispute fees are set out in the <a class="link" href="/legal/terms">Terms</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BRANDS ================= -->
+  <section class="section" id="brands" aria-labelledby="brands-h">
+    <div class="wrap">
+      <div class="brands">
+        <figure class="art art--brands ph-brands reveal">
+          <!-- IMAGE-SLOT id="brands-panel" ratio="4:3" px="1800x1350" prompt="Abstract studio still life of twelve flat rectangular material chips fanned across a bone white #F7F8FA sweep in one loose arc. Most chips are near black #0E1016 and electric ultramarine #2436E0, three of them are acid yellow green #DDF247. A single hot orange #FF4A1C chip is held above the arc on a fine polished steel armature and casts a distinct hard shadow onto the chips below it. Soft large key light from above and slightly behind, crisp contact shadows, subtle matte paper texture on every chip, cool grey #C9CEDA falloff at the frame edges. Deliberate, curated, premium product photography discipline, generous empty space at the top of the frame. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="brands-panel" src="./generated/three--brands-panel.jpg" alt="" width="1800" height="1350" loading="lazy" decoding="async">
+        </figure>
+
+        <div class="brands__body reveal" style="--i:1">
+          <h2 class="h2" id="brands-h">Put up the prize pool. Your name runs the competition.</h2>
+          <div class="stack" style="margin-top:1.2rem">
+            <p class="lede">A brand funds a pool and hosts the competition it pays for. The board shows the host name, the host type, and the amount the host put up, next to the entry fee every player pays.</p>
+            <p>Business verification has to pass before a brand account can move any value at all. There is no bypass, no advisory route and no partial approval.</p>
+            <p class="small dim">No campaign has run on Boadman yet, so there are no brand results, no case studies and no partner names to show. That stays true until a campaign runs. Brand hosting terms are in the <a class="link" href="/legal/terms">Terms</a>.</p>
+            <div class="btn-row" style="margin-top:.4rem">
+              <a class="btn btn--primary" href="/signup-brand">Create brand account</a>
+              <a class="btn btn--ghost" href="mailto:support@boadman.com">Email support</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PUBLISHERS ================= -->
+  <section class="pub field-ultra on-ultra" id="publishers" aria-labelledby="pub-h">
+    <figure class="art ph-pub">
+      <!-- IMAGE-SLOT id="publishers-canvas" ratio="21:9" px="2520x1080" prompt="Abstract wide photograph of a long bone white #ECEEF2 wall carrying a row of blank brushed aluminium plates hinged along one vertical edge, the row receding into the distance toward the right of the frame. Every plate lies closed flat against the wall except the nearest one on the left, which is swung wide open to reveal a deep acid yellow green #DDF247 interior recess. Cool even daylight arriving from the left, long soft shadows raking to the right, faint electric ultramarine #2436E0 reflected in the brushed metal faces, near black #0E1016 only inside the open recess. Architectural, spacious, calm, one single clear point of entry, large areas of empty wall. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="publishers-canvas" src="./generated/three--publishers-canvas.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+    </figure>
+    <!-- Scrim: ultramarine at 0.90 alpha. Worst case flattening (pure white
+         image beneath) gives paper text 5.5:1. -->
+    <div class="pub__scrim"></div>
+
+    <div class="pub__body">
+      <div class="wrap">
+        <div class="reveal">
+          <h2 class="h2" id="pub-h">No game is here until a publisher puts it here.</h2>
+          <div class="stack measure" style="margin-top:1.2rem">
+            <p class="lede">Publishers license their titles to Boadman and take a royalty share of platform commission. That licence is the only mechanism by which any game can be competed on here, which is why the board above is empty.</p>
+            <p>A royalty is a share of commission, not a share of the stakes, and commission only exists once a competition settles. There is no publisher signup route yet. The waitlist is the only door open.</p>
+            <p class="small dim">Licensing and royalty terms are in the <a class="link" href="/legal/terms">Terms</a>.</p>
+            <div class="btn-row" style="margin-top:.4rem">
+              <a class="btn btn--primary" href="/waitlist/publishers">Join the publisher waitlist</a>
+              <a class="btn btn--ghost" href="mailto:compliance@boadman.com">Email compliance</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CLOSE ================= -->
+  <section class="close field-acid on-acid" aria-labelledby="close-h">
+    <div class="wrap close__in">
+      <h2 id="close-h" class="reveal">Accounts are open.<br>Competitions are not.</h2>
+      <div class="reveal" style="--i:1">
+        <p class="lede" style="max-width:38ch">You can create an account today. There is nothing to enter until a publisher licenses a title, and nothing leaves your wallet until you stake it.</p>
+        <div class="btn-row" style="margin-top:1.4rem">
+          <a class="btn btn--primary" href="/signup">Create account</a>
+          <a class="btn btn--ghost" href="/signin">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RESPONSIBLE PLAY ================= -->
+  <section class="section" id="responsible" aria-labelledby="resp-h">
+    <div class="wrap">
+      <div class="resp">
+        <figure class="art art--close ph-close reveal">
+          <!-- IMAGE-SLOT id="responsible-close" ratio="16:9" px="2400x1350" prompt="Abstract quiet still life of one single sheet of thick matte cool grey paper resting flat on a slightly darker cool grey surface, its lower right corner turned up and standing away from the plane. Soft diffuse overhead light, a long gentle tonal gradient running across the sheet, one precise hot orange #FF4A1C printed line following the turned edge and nothing else on the paper. Palette strictly cool grey #ECEEF2 and #C9CEDA and #B9BEC9 with near black #0E1016 in the crease shadow, plus the single orange line. Restrained, calm, low contrast, heavy visible paper fibre texture, generous empty space. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no playing cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="responsible-close" src="./generated/three--responsible-close.jpg" alt="" width="2400" height="1350" loading="lazy" decoding="async">
+        </figure>
+
+        <div class="reveal" style="--i:1">
+          <h2 class="h2" id="resp-h">18+. One entrant takes the pot. The rest lose their stake.</h2>
+          <p class="lede" style="margin-top:1.1rem">If competing for money stops being something you choose, GamCare is independent of Boadman and free to contact.</p>
+
+          <div class="resp__cols">
+            <div>
+              <h3 class="h3">GamCare</h3>
+              <a class="gamcare link" href="tel:08088020133">0808 8020 133</a>
+              <p class="small"><a class="link" href="https://www.gamcare.org.uk" rel="noopener noreferrer">gamcare.org.uk</a></p>
+              <p class="small dim" style="margin-top:.6rem">Independent support, not run by Boadman.</p>
+            </div>
+            <div>
+              <h3 class="h3">What Boadman does not have</h3>
+              <p class="small" style="margin-top:.5rem">There are no deposit limits, loss limits, session reminders, reality checks, cooling-off timers or self-exclusion on this platform.</p>
+              <p class="small" style="margin-top:.5rem">Account suspension is a manual request to <a class="link" href="mailto:support@boadman.com">support@boadman.com</a> and is done by hand.</p>
+            </div>
+          </div>
+
+          <p class="small dim" style="margin-top:1.1rem">Read the <a class="link" href="/legal/responsible-play">responsible play policy</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer on-ink">
+  <div class="wrap">
+    <div class="footer__top">
+      <p class="footer__age">18+ only. Money you stake can be lost, and a prize can be frozen or reversed after a complaint.</p>
+      <a class="btn btn--primary" href="/signup">Create account</a>
+    </div>
+
+    <div class="footer__cols">
+      <div>
+        <h2>Play</h2>
+        <ul>
+          <li><a href="/signup">Create account</a></li>
+          <li><a href="/signin">Sign in</a></li>
+          <li><a href="/faqs">FAQs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Business</h2>
+        <ul>
+          <li><a href="/signup-brand">Create brand account</a></li>
+          <li><a href="/waitlist/publishers">Publisher waitlist</a></li>
+          <li><a href="mailto:compliance@boadman.com">compliance@boadman.com</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="/legal/terms">Terms</a></li>
+          <li><a href="/legal/privacy">Privacy</a></li>
+          <li><a href="/legal/cookies">Cookies</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Support</h2>
+        <ul>
+          <li><a href="/legal/responsible-play">Responsible play</a></li>
+          <li><a href="https://www.gamcare.org.uk" rel="noopener noreferrer">GamCare</a></li>
+          <li><a href="tel:08088020133">0808 8020 133</a></li>
+          <li><a href="mailto:support@boadman.com">support@boadman.com</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__end">
+      <span>Coins are bought with real money. 1 coin costs 10p.</span>
+      <span>Commission is deducted from every settled competition.</span>
+      <span>Access is limited by location.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================ DESIGN CHROME ============================
+     Everything below this line is review tooling for this design file.
+     It is not part of the page and would not ship.
+     ==================================================================== -->
+<div class="cookie-ghost" aria-hidden="true">
+  <div class="wrap">
+    <p>Cookie consent occupies this band on a first anonymous visit, and can escalate to a full screen modal.</p>
+    <p class="small">Design chrome. The hero reserves this height so that the age statement, the cost line, the risk line and the primary action all stay above it.</p>
+  </div>
+</div>
+
+<details class="rig" id="rig" open>
+  <summary>Review rig</summary>
+  <div class="rig__in">
+    <p>Design chrome. Not part of the page.</p>
+
+    <label for="rigBoard">Competitions feed</label>
+    <select id="rigBoard">
+      <option value="empty" selected>Empty (production today)</option>
+      <option value="loading">Loading</option>
+      <option value="open">Open (sample data)</option>
+      <option value="error">Failed</option>
+    </select>
+
+    <div class="row"><input type="checkbox" id="rigCounters"><label for="rigCounters" style="margin:0">Counters present (sample)</label></div>
+    <div class="row"><input type="checkbox" id="rigRates"><label for="rigRates" style="margin:0">Rate readable (sample)</label></div>
+    <div class="row"><input type="checkbox" id="rigCookie"><label for="rigCookie" style="margin:0">Cookie banner ghost</label></div>
+    <div class="row"><input type="checkbox" id="rigDark"><label for="rigDark" style="margin:0">Dark surface</label></div>
+  </div>
+</details>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  /* default states: what production actually renders today */
+  root.setAttribute("data-board", "empty");
+  root.setAttribute("data-counters", "absent");
+  root.setAttribute("data-rates", "unreadable");
+  root.setAttribute("data-cookie", "off");
+
+  /* ---- scroll reveal. Reason: hierarchy. Sections announce themselves in
+         reading order instead of arriving all at once. One shot, then the
+         observer releases the element. ---- */
+  var revealables = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window) || reduce.matches) {
+    revealables.forEach(function (el) { el.classList.add("is-in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
+    revealables.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---- 48 hour timeline. Reason: state transition. The bar runs once from
+         held to matured so the mechanic is shown, not just described. ---- */
+  var tl = document.getElementById("timeline");
+  if (tl) {
+    if (!("IntersectionObserver" in window) || reduce.matches) {
+      tl.classList.add("is-run");
+    } else {
+      var io2 = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("is-run"); io2.unobserve(e.target); }
+        });
+      }, { threshold: 0.5 });
+      io2.observe(tl);
+    }
+  }
+
+  /* ---- money path rail ---- */
+  var rail = document.getElementById("rail");
+  function nudge(dir) {
+    if (!rail) return;
+    var step = rail.querySelector(".step");
+    var d = step ? step.getBoundingClientRect().width + 2 : 280;
+    rail.scrollBy({ left: dir * d, behavior: reduce.matches ? "auto" : "smooth" });
+  }
+  var prev = document.getElementById("railPrev");
+  var next = document.getElementById("railNext");
+  if (prev) prev.addEventListener("click", function () { nudge(-1); });
+  if (next) next.addEventListener("click", function () { nudge(1); });
+
+  /* ---- mobile navigation ---- */
+  var mb = document.getElementById("menuBtn");
+  var mp = document.getElementById("menuPanel");
+  if (mb && mp) {
+    mb.addEventListener("click", function () {
+      var open = mb.getAttribute("aria-expanded") === "true";
+      mb.setAttribute("aria-expanded", String(!open));
+      mp.setAttribute("data-open", String(!open));
+    });
+    mp.addEventListener("click", function (e) {
+      if (e.target.tagName === "A") {
+        mb.setAttribute("aria-expanded", "false");
+        mp.setAttribute("data-open", "false");
+      }
+    });
+  }
+
+  /* ---- board retry: real feedback, loading then the real empty result ---- */
+  var retry = document.getElementById("retryBtn");
+  var rigBoard = document.getElementById("rigBoard");
+  if (retry) {
+    retry.addEventListener("click", function () {
+      root.setAttribute("data-board", "loading");
+      if (rigBoard) rigBoard.value = "loading";
+      window.setTimeout(function () {
+        root.setAttribute("data-board", "empty");
+        if (rigBoard) rigBoard.value = "empty";
+      }, 1100);
+    });
+  }
+
+  /* ---- review rig ---- */
+  if (rigBoard) {
+    rigBoard.addEventListener("change", function () { root.setAttribute("data-board", rigBoard.value); });
+  }
+  function bind(id, fn) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("change", function () { fn(el.checked); });
+  }
+  bind("rigCounters", function (on) { root.setAttribute("data-counters", on ? "present" : "absent"); });
+  bind("rigRates", function (on) { root.setAttribute("data-rates", on ? "readable" : "unreadable"); });
+  bind("rigCookie", function (on) { root.setAttribute("data-cookie", on ? "on" : "off"); });
+  bind("rigDark", function (on) { root.setAttribute("data-theme", on ? "dark" : "light"); });
+})();
+</script>
+
+</body>
+</html>

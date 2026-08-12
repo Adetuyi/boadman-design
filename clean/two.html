@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en-GB" class="b-empty c-zero r-ok">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boadman</title>
+<meta name="description" content="Boadman is a competition platform for video game players aged 18 or over. Buy coins, stake them on a 1v1 or a tournament, and follow the pot through hold, settlement and payout.">
+
+<!--
+  DIRECTION TWO of three. Independent clean-slate landing concept.
+
+  Art pipeline: every section declares an IMAGE-SLOT comment immediately before a
+  considered CSS placeholder. The batch generator inserts the real image element
+  right after the comment, and the placeholder stays behind it as the pre-art layer.
+
+      cd design-alternatives/tools
+      node gen-slots.mjs ../clean/two.html --out ../clean/generated --dry
+      node gen-slots.mjs ../clean/two.html --out ../clean/generated
+
+  (--out must be ../clean/generated: the wiring step writes ./generated/<id>.png
+  relative to this file.)
+
+  Typography note: production self-hosts Space Grotesk / Barlow Condensed / Inter /
+  JetBrains Mono. This file may not link an external font, so it uses the system UI
+  stack with tabular figures forced on every money value. The type SCALE and the
+  tabular-figure rule are the parts that carry over.
+
+  Iconography note: no icon library can be loaded here (no CDN, no build). The only
+  glyph shapes used are CSS-drawn chevrons on the rail controls. No hand-rolled SVG.
+
+  Image alt text is intentionally empty. The art is atmosphere, the argument is in
+  the text, so the images are decorative to assistive tech.
+-->
+
+<style>
+/* =========================================================================
+   1. TOKENS
+   Palette departs from production near-black + single orange, on purpose.
+   Base field is a deep ULTRAMARINE, not a neutral near-black, so the page
+   reads as colour rather than as an absence of it.
+
+     ink field   #0B1338   page
+     panel       #141E56   raised surface
+     cobalt      #1B2FA8   saturated structural field / light-mode accent line
+     azure       #2E6BFF   secondary field, used in art and in fills
+     citron      #D8FF4A   system accent: live state, rules, focus, markers
+     flame       #FF5733   brand accent, retained from the real mark: FILL ONLY
+     porcelain   #EEF2FF   primary text
+
+   Measured contrast on the dark field (#0B1338):
+     porcelain  15.98:1     ink-2 (#A8B4E0)  8.74:1
+     citron     15.59:1     flame            5.67:1  (never used as text)
+   Ink on a flame fill: 5.67:1. That deliberately fixes the documented
+   3.15:1 white-on-primary-button defect: flame buttons take INK labels.
+   Ink on a citron fill: 15.59:1.
+
+   Text over imagery never floats on raw art. It sits on a directional scrim
+   that reaches at least 0.90 alpha of #060A26 in the text region. Worst case
+   (a pure white image beneath) that composite is #1F223C, where porcelain
+   still measures 13.84:1 and ink-2 measures 7.57:1.
+
+   Radius rule, locked: surfaces, frames and images are square (0). Interactive
+   controls are 3px. Nothing on this page is a pill.
+   ========================================================================= */
+:root{
+  --page:#0B1338;
+  --page-deep:#070B24;
+  --panel:#141E56;
+  --panel-2:#101A48;
+  --cobalt:#1B2FA8;
+  --azure:#2E6BFF;
+  --citron:#D8FF4A;
+  --flame:#FF5733;
+  --ember:#FFA700;
+  --ink:#EEF2FF;
+  --ink-2:#A8B4E0;
+  --rule:rgba(238,242,255,.14);
+  /* .45 so a ghost-button border still measures 3.9:1 against the darkest
+     scrimmed art it can sit on, per WCAG 1.4.11 non-text contrast. */
+  --rule-strong:rgba(238,242,255,.45);
+  --accent-line:var(--citron);
+  --accent-fill:var(--flame);
+  --on-accent:#0B1338;
+  --focus:var(--citron);
+  --plate:rgba(6,10,38,.90);
+  --plate-soft:rgba(6,10,38,.72);
+
+  --sans:ui-sans-serif,system-ui,"Segoe UI Variable Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono","JetBrains Mono",Consolas,"Liberation Mono",monospace;
+
+  --t-display:clamp(2.35rem,5.4vw,5.1rem);
+  --t-h2:clamp(1.75rem,3.4vw,3.1rem);
+  --t-h3:clamp(1.05rem,1.5vw,1.35rem);
+  --t-body:clamp(1rem,1.06vw,1.125rem);
+  --t-small:clamp(.875rem,.95vw,.95rem);
+
+  --gut:clamp(1.25rem,4vw,4rem);
+  --stack:clamp(4.5rem,9vw,9rem);
+  --wrap:1360px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+@media (prefers-color-scheme: light){
+  :root{
+    --page:#EAEEFC;
+    --page-deep:#DEE4FA;
+    --panel:#FFFFFF;
+    --panel-2:#F3F6FF;
+    --ink:#0B1338;
+    --ink-2:#3A4790;
+    --rule:rgba(11,19,56,.16);
+    --rule-strong:rgba(11,19,56,.55);
+    /* citron disappears on a light field, so the hairline accent becomes
+       cobalt (8.98:1 here). Citron survives as a FILL with ink on top. */
+    --accent-line:var(--cobalt);
+    --focus:var(--cobalt);
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--page);color:var(--ink);
+  font-family:var(--sans);font-size:var(--t-body);line-height:1.62;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+[hidden]{display:none!important}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{margin:0;font-weight:680;letter-spacing:-.02em;line-height:1.06}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+
+::selection{background:var(--citron);color:#0B1338}
+
+:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:2px;
+  border-radius:1px;
+}
+
+.wrap{max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gut)}
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:100;
+  background:var(--citron);color:#0B1338;padding:.85rem 1.25rem;font-weight:700;
+}
+.skip:focus{left:.5rem;top:.5rem}
+
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+/* =========================================================================
+   2. IMAGE FRAMES + PLACEHOLDERS
+   The generator injects an image element carrying data-gen-slot straight after
+   the slot comment. It sits on top of the CSS placeholder underneath it.
+   ========================================================================= */
+.frame{position:relative;overflow:hidden;background:var(--page-deep);isolation:isolate}
+.frame > img[data-gen-slot]{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:1;
+}
+.ph{position:absolute;inset:0;z-index:0}
+.ph::after{
+  content:"";position:absolute;inset:0;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);
+  opacity:.5;mix-blend-mode:overlay;
+}
+
+/* Each placeholder is composed for the art that will replace it, not a
+   two-stop gradient. */
+.ph--hero{
+  background:
+    radial-gradient(120% 90% at 78% 24%,rgba(216,255,74,.32),transparent 55%),
+    radial-gradient(90% 120% at 62% 70%,rgba(255,87,51,.34),transparent 58%),
+    linear-gradient(104deg,#070B24 0%,#0D1745 34%,#1B2FA8 68%,#2E6BFF 100%);
+}
+.ph--route{
+  background:
+    linear-gradient(180deg,transparent 46%,rgba(216,255,74,.85) 47.6%,rgba(216,255,74,.85) 49.4%,transparent 50.5%),
+    repeating-linear-gradient(178deg,#0A1234 0 26px,#101A48 26px 46px,#16225C 46px 62px),
+    linear-gradient(90deg,#070B24,#16225C);
+}
+.ph--coins{
+  background:
+    repeating-linear-gradient(180deg,rgba(238,242,255,.10) 0 2px,transparent 2px 26px),
+    linear-gradient(180deg,rgba(216,255,74,.34),transparent 42%),
+    linear-gradient(190deg,#101A48,#1B2FA8 70%,#070B24);
+}
+.ph--board{
+  background:
+    repeating-linear-gradient(90deg,rgba(238,242,255,.07) 0 1px,transparent 1px 84px),
+    repeating-linear-gradient(0deg,rgba(238,242,255,.07) 0 1px,transparent 1px 56px),
+    radial-gradient(70% 90% at 88% 76%,rgba(216,255,74,.22),transparent 60%),
+    linear-gradient(200deg,#070B24,#0F1946 62%,#16225C);
+}
+.ph--stops{
+  background:
+    repeating-linear-gradient(90deg,transparent 0 96px,rgba(27,47,168,.95) 96px 120px),
+    linear-gradient(180deg,transparent 38%,rgba(216,255,74,.9) 44%,rgba(255,167,0,.65) 52%,transparent 60%),
+    linear-gradient(90deg,#0B1338,#070B24);
+}
+.ph--brands{
+  background:
+    linear-gradient(126deg,transparent 42%,rgba(255,87,51,.92) 43%,rgba(255,167,0,.85) 58%,transparent 59%),
+    radial-gradient(80% 60% at 50% 96%,rgba(46,107,255,.7),transparent 62%),
+    linear-gradient(200deg,#101A48,#1B2FA8);
+}
+.ph--publishers{
+  background:
+    linear-gradient(90deg,transparent 49.3%,rgba(216,255,74,.95) 49.8%,rgba(238,242,255,.9) 50.2%,transparent 50.7%),
+    radial-gradient(40% 100% at 50% 50%,rgba(46,107,255,.42),transparent 70%),
+    linear-gradient(90deg,#070B24,#0D1745 46%,#0D1745 54%,#070B24);
+}
+.ph--care{
+  background:
+    linear-gradient(180deg,rgba(255,167,0,.28),transparent 40%),
+    linear-gradient(180deg,#0D1745,#070B24 78%);
+}
+.ph--close{
+  background:
+    linear-gradient(180deg,transparent 68%,rgba(216,255,74,.85) 71%,rgba(255,87,51,.8) 74%,transparent 78%),
+    linear-gradient(180deg,#070B24 0%,#0B1338 60%,#141E56 100%);
+}
+
+/* Directional scrim. Text sits only inside the >=0.90 region. */
+/* MEDIA SURFACES STAY DARK IN BOTH MODES.
+   A scrim over art has to stay dark to keep text legible, so every text block
+   that sits on one is pinned to porcelain rather than to the mode token.
+   Without this the light theme would put #0B1338 ink on a dark scrim. */
+.hero__copy,.band__copy,.close__in{color:#EEF2FF}
+.hero__sub{color:#C6CFF2}
+.hero__cta .btn--ghost{color:#EEF2FF;border-color:rgba(238,242,255,.45)}
+.hero__cta .btn--ghost:hover{border-color:#EEF2FF}
+
+.scrim{position:absolute;inset:0;z-index:2;pointer-events:none}
+.scrim--left{
+  background:
+    linear-gradient(90deg,rgba(6,10,38,.95) 0%,rgba(6,10,38,.92) 34%,rgba(6,10,38,.55) 60%,rgba(6,10,38,.12) 88%,rgba(6,10,38,.28) 100%);
+}
+.scrim--bottom{
+  background:linear-gradient(0deg,rgba(6,10,38,.95) 0%,rgba(6,10,38,.90) 26%,rgba(6,10,38,.42) 55%,rgba(6,10,38,.10) 86%);
+}
+.scrim--full{background:rgba(6,10,38,.90)}
+@media (max-width:760px){
+  .scrim--left{background:linear-gradient(0deg,rgba(6,10,38,.95) 0%,rgba(6,10,38,.92) 46%,rgba(6,10,38,.5) 78%,rgba(6,10,38,.25) 100%)}
+}
+
+/* =========================================================================
+   3. CONTROLS
+   ========================================================================= */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  font:inherit;font-weight:700;letter-spacing:-.005em;white-space:nowrap;
+  padding:.9rem 1.5rem;border-radius:3px;border:2px solid transparent;
+  text-decoration:none;cursor:pointer;
+  transition:transform .18s var(--ease),background-color .18s var(--ease),border-color .18s var(--ease);
+}
+.btn--primary{background:var(--accent-fill);color:var(--on-accent);border-color:var(--accent-fill)}
+.btn--primary:hover{transform:translateY(-1px);background:#FF6E4F;border-color:#FF6E4F}
+.btn--primary:active{transform:scale(.985)}
+.btn--ghost{background:transparent;color:var(--ink);border-color:var(--rule-strong)}
+.btn--ghost:hover{transform:translateY(-1px);border-color:var(--ink)}
+.btn--ghost:active{transform:scale(.985)}
+.btn--key{background:var(--citron);color:#0B1338;border-color:var(--citron)}
+.btn--key:hover{transform:translateY(-1px);background:#E4FF74;border-color:#E4FF74}
+.btn--key:active{transform:scale(.985)}
+.btn--sm{padding:.6rem 1rem;font-size:var(--t-small)}
+
+.link{
+  color:var(--ink);text-decoration:none;
+  border-bottom:2px solid var(--accent-line);padding-bottom:1px;font-weight:600;
+  transition:color .18s var(--ease),border-color .18s var(--ease);
+}
+.link:hover{color:var(--ink);border-color:var(--ink)}
+.terms{
+  display:inline-block;margin-top:1.5rem;font-size:var(--t-small);color:var(--ink-2);
+  text-decoration:none;border-bottom:1px solid var(--rule-strong);padding-bottom:2px;
+}
+.terms:hover{color:var(--ink);border-color:var(--ink)}
+
+.chip{
+  display:inline-flex;align-items:center;font-family:var(--mono);font-size:.78rem;
+  font-weight:700;letter-spacing:.06em;padding:.3rem .55rem;border-radius:3px;
+  border:1.5px solid var(--accent-line);color:var(--ink);
+}
+.chip--fill{background:var(--citron);color:#0B1338;border-color:var(--citron)}
+
+/* =========================================================================
+   4. MASTHEAD
+   ========================================================================= */
+.masthead{
+  position:sticky;top:0;z-index:40;
+  background:rgba(7,11,36,.86);backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--rule);
+}
+@media (prefers-color-scheme: light){.masthead{background:rgba(234,238,252,.88)}}
+.masthead__in{
+  max-width:var(--wrap);margin-inline:auto;padding:0 var(--gut);
+  height:72px;display:flex;align-items:center;gap:1.5rem;
+}
+.brand{display:flex;align-items:center;flex:0 0 auto}
+.brand img{height:26px;width:auto}
+.brand__fallback{font-weight:800;letter-spacing:.02em}
+.masthead nav{margin-left:auto}
+.navlist{display:flex;align-items:center;gap:1.5rem}
+.navlist a{
+  text-decoration:none;color:var(--ink-2);font-size:var(--t-small);font-weight:600;
+  padding:.35rem 0;border-bottom:2px solid transparent;transition:color .18s var(--ease),border-color .18s var(--ease);
+}
+.navlist a:hover{color:var(--ink);border-color:var(--accent-line)}
+.masthead__act{display:flex;align-items:center;gap:.75rem;flex:0 0 auto}
+.menu-btn{display:none}
+
+@media (max-width:1079px){
+  .masthead nav,.masthead__act .btn--ghost{display:none}
+  .menu-btn{
+    display:inline-flex;align-items:center;gap:.5rem;margin-left:auto;
+    background:transparent;border:2px solid var(--rule-strong);border-radius:3px;
+    color:var(--ink);font:inherit;font-size:var(--t-small);font-weight:700;
+    padding:.55rem .85rem;cursor:pointer;
+  }
+  .menu-btn__bars{display:block;width:16px;height:2px;background:currentColor;position:relative}
+  .menu-btn__bars::before,.menu-btn__bars::after{
+    content:"";position:absolute;left:0;width:16px;height:2px;background:currentColor;
+  }
+  .menu-btn__bars::before{top:-5px}
+  .menu-btn__bars::after{top:5px}
+  .drawer{
+    display:block;border-top:1px solid var(--rule);background:var(--page-deep);
+    padding:1rem var(--gut) 1.5rem;
+  }
+  .drawer .navlist{flex-direction:column;align-items:stretch;gap:0}
+  .drawer .navlist a{padding:.9rem 0;border-bottom:1px solid var(--rule);font-size:1.05rem;color:var(--ink)}
+  .drawer__act{display:flex;gap:.75rem;margin-top:1.25rem}
+  .drawer__act .btn{flex:1}
+}
+@media (min-width:1080px){.drawer{display:none!important}}
+
+/* =========================================================================
+   5. HERO
+   The bottom band of the first viewport is reserved. A first anonymous visit
+   gets a cookie banner covering roughly 180-260px there, so nothing the
+   visitor needs is allowed to sit in that zone. Toggle it in the review rig.
+   ========================================================================= */
+.hero{position:relative;min-height:calc(100dvh - 72px);display:grid;grid-template-rows:1fr auto}
+.hero__art{position:absolute;inset:0;z-index:0}
+.hero__art .frame{position:absolute;inset:0}
+.hero__body{position:relative;z-index:3;align-self:center;width:100%;padding-block:clamp(2rem,5vh,4rem)}
+.hero__grid{max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gut)}
+.hero__copy{max-width:min(56ch,58%)}
+@media (max-width:900px){.hero__copy{max-width:100%}}
+.hero h1{font-size:var(--t-display);letter-spacing:-.035em;line-height:1.02}
+.hero h1 .l{display:block}
+@media (max-width:640px){.hero h1 .l{display:inline}}
+/* The page's one colour emphasis: the second sentence is the argument, and
+   citron is the colour used for every stop and hold marker further down.
+   Fixed value, because it sits on a dark scrim in both themes. 15.6:1. */
+.hero h1 .hot{color:var(--citron)}
+.hero__sub{
+  margin-top:1.5rem;font-size:clamp(1.05rem,1.35vw,1.3rem);
+  max-width:52ch;line-height:1.55;
+}
+.hero__cta{display:flex;flex-wrap:wrap;gap:.85rem;margin-top:2.25rem}
+/* Reserved zone: keeps CTAs clear of the consent banner. */
+.hero__reserve{min-height:clamp(150px,23vh,270px)}
+.hero__mark{
+  position:relative;z-index:3;align-self:end;padding:0 var(--gut) 1.5rem;
+  max-width:var(--wrap);margin-inline:auto;width:100%;
+}
+
+/* =========================================================================
+   6. SECTION SHELL
+   ========================================================================= */
+.sec{position:relative;padding-block:var(--stack)}
+.sec__head{max-width:62ch}
+.sec h2{font-size:var(--t-h2);letter-spacing:-.03em}
+.sec__lede{margin-top:1.15rem;color:var(--ink-2);font-size:clamp(1.02rem,1.2vw,1.2rem);max-width:60ch}
+.rulemark{width:56px;height:4px;background:var(--accent-line);margin-bottom:1.75rem}
+
+/* --- 6.1 route: image band with the headline on it, then a snap rail ---- */
+.band{position:relative;height:clamp(320px,44vw,560px)}
+.band .frame{position:absolute;inset:0}
+.band__copy{
+  position:absolute;z-index:3;inset:auto 0 0 0;padding:0 var(--gut) clamp(1.75rem,4vw,3rem);
+  max-width:var(--wrap);margin-inline:auto;
+}
+.band__copy .sec__lede{color:#C6CFF2}
+
+.railwrap{padding-top:clamp(2rem,4vw,3.25rem)}
+.railbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.25rem}
+.railbar__note{font-size:var(--t-small);color:var(--ink-2);max-width:46ch}
+.railnav{display:flex;gap:.5rem}
+.arrow{
+  width:44px;height:44px;border:2px solid var(--rule-strong);background:transparent;border-radius:3px;
+  cursor:pointer;display:grid;place-items:center;color:var(--ink);
+  transition:border-color .18s var(--ease),transform .18s var(--ease),opacity .18s var(--ease);
+}
+.arrow:hover:not(:disabled){border-color:var(--accent-line);transform:translateY(-1px)}
+.arrow:disabled{opacity:.35;cursor:not-allowed}
+.arrow i{width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;display:block}
+.arrow--prev i{transform:rotate(135deg);margin-left:3px}
+.arrow--next i{transform:rotate(-45deg);margin-right:3px}
+
+.rail{
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(268px,31%);
+  gap:1px;background:var(--rule);border-block:1px solid var(--rule);
+  overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;
+}
+.rail:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.step{
+  scroll-snap-align:start;background:var(--page);padding:1.75rem clamp(1.15rem,1.8vw,1.75rem) 2rem;
+  display:flex;flex-direction:column;gap:.85rem;
+}
+/* Order is carried by the ordered list and by left-to-right position, not by
+   printed step numbers. */
+.step h3{font-size:var(--t-h3)}
+.step p{font-size:var(--t-small);color:var(--ink-2);line-height:1.6}
+.step__risk{
+  margin-top:auto;padding-top:.9rem;border-top:2px solid var(--accent-line);
+  color:var(--ink)!important;font-weight:600;
+}
+@media (max-width:640px){.rail{grid-auto-columns:84%}}
+
+/* --- 6.2 coins: image left, argument right ----------------------------- */
+.split{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(1.5rem,4vw,4.5rem);align-items:center}
+.split .frame{aspect-ratio:3/4}
+@media (max-width:900px){
+  .split{grid-template-columns:1fr}
+  .split .frame{aspect-ratio:4/3}
+}
+.figure-block{
+  border:1px solid var(--rule);border-left:4px solid var(--accent-line);
+  background:var(--panel-2);padding:clamp(1.4rem,2.4vw,2rem);margin-top:1.75rem;
+}
+.figure-block .rate{font-size:clamp(1.6rem,2.6vw,2.3rem);font-weight:700;letter-spacing:-.02em}
+.figure-block .qual{margin-top:.5rem;color:var(--ink-2);font-size:var(--t-small)}
+.figure-block .risk{margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--rule);font-size:var(--t-body)}
+
+/* --- 6.3 board --------------------------------------------------------- */
+.board__head{display:grid;grid-template-columns:minmax(0,1fr);gap:1.25rem}
+.counters{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin-top:2rem;
+}
+.counters li{background:var(--page);padding:1.15rem 1.25rem}
+.counters .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:clamp(1.5rem,2.4vw,2.1rem);font-weight:700}
+.counters .k{display:block;margin-top:.35rem;font-size:.85rem;color:var(--ink-2)}
+@media (max-width:760px){.counters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Contained art band, held to the text column rather than bled to the
+   viewport, so it does not repeat the two full-bleed bands on the page. */
+.artstrip{position:relative;aspect-ratio:21/9;max-height:46vh;margin-top:clamp(2rem,4vw,3rem)}
+.artstrip .frame{position:absolute;inset:0}
+
+.quiet-state{
+  margin-top:2rem;border:1px solid var(--rule);border-top:4px solid var(--accent-line);
+  background:var(--panel-2);padding:clamp(1.4rem,2.4vw,2rem);
+}
+.quiet-state p{max-width:64ch}
+.quiet-state p + p{margin-top:.85rem}
+.quiet-line{
+  margin-top:1.5rem;padding-left:1rem;border-left:2px solid var(--rule-strong);
+  color:var(--ink-2);font-size:var(--t-small);max-width:66ch;
+}
+
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:2rem}
+@media (max-width:980px){.cards{grid-template-columns:1fr}}
+.comp{background:var(--page);display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:background-color .18s var(--ease)}
+.comp:hover{background:var(--panel-2)}
+/* No licensed game art exists, so a card's art slot is a typographic field. */
+.comp__art{
+  position:relative;aspect-ratio:16/7;display:grid;align-items:end;padding:1rem 1.15rem;
+  /* Fixed values, not mode tokens: this is a media surface and it stays dark
+     in both themes so the porcelain label on it never inverts. */
+  background:
+    repeating-linear-gradient(115deg,rgba(238,242,255,.05) 0 1px,transparent 1px 9px),
+    linear-gradient(160deg,#1B2FA8,#101A48);
+}
+.comp__game{font-family:var(--mono);font-size:.8rem;letter-spacing:.16em;color:#EEF2FF;font-weight:700}
+.comp__state{
+  position:absolute;top:.85rem;right:.85rem;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.12em;font-weight:700;padding:.25rem .45rem;border-radius:3px;
+  background:var(--citron);color:#0B1338;
+}
+.comp__state[data-state="open"]{background:#EEF2FF;color:#0B1338}
+.comp__state[data-state="soon"]{background:transparent;color:#EEF2FF;border:1.5px solid rgba(238,242,255,.5)}
+.comp__body{padding:1.25rem 1.15rem 1.5rem;display:flex;flex-direction:column;gap:.75rem;flex:1}
+.comp h3{font-size:1.05rem}
+.comp dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;margin:0;font-size:var(--t-small)}
+.comp dt{color:var(--ink-2)}
+.comp dd{margin:0;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.comp dd.plain{font-family:var(--sans)}
+.comp__host{font-size:var(--t-small);color:var(--ink-2);margin-top:auto;padding-top:.75rem;border-top:1px solid var(--rule)}
+
+/* --- 6.4 stops: asymmetric tile grid, 5 items -> 5 cells --------------- */
+.tiles{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin-top:2.5rem;
+}
+.tile{background:var(--page);padding:clamp(1.35rem,2.2vw,2rem)}
+.tile h3{font-size:var(--t-h3);margin-bottom:.65rem}
+.tile p{color:var(--ink-2);font-size:var(--t-small)}
+.tile:nth-child(1){grid-column:span 3}
+.tile:nth-child(2){grid-column:span 3}
+.tile:nth-child(3){grid-column:span 2}
+.tile:nth-child(4){grid-column:span 2}
+.tile:nth-child(5){grid-column:span 2}
+.tile--lead{background:var(--panel)}
+.tile--lead h3{font-size:clamp(1.25rem,2vw,1.75rem)}
+/* Mode token, not a fixed value: this tile sits on --panel, which inverts. */
+.tile--lead p{color:var(--ink-2)}
+@media (max-width:900px){
+  .tiles{grid-template-columns:1fr}
+  .tile,.tile:nth-child(n){grid-column:span 1}
+}
+
+/* --- 6.5 brands: colour-blocked diptych -------------------------------- */
+.diptych{display:grid;grid-template-columns:1fr 1fr;min-height:clamp(420px,52vw,620px)}
+.diptych .frame{min-height:100%}
+.diptych__field{
+  background:var(--cobalt);color:#EEF2FF;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(2rem,5vw,4.5rem);
+}
+.diptych__field h2,.diptych__field p{color:#EEF2FF}
+.diptych__field .sec__lede{color:#D5DCFA}
+.diptych__field .terms{color:#D5DCFA;border-color:rgba(238,242,255,.4)}
+.diptych__field .terms:hover{color:#fff;border-color:#fff}
+.diptych__field .rulemark{background:var(--citron)}
+@media (max-width:900px){
+  .diptych{grid-template-columns:1fr}
+  .diptych .frame{aspect-ratio:4/3;min-height:0}
+}
+
+/* --- 6.6 publishers: mini section, art beneath ------------------------- */
+.mini{text-align:center;max-width:66ch;margin-inline:auto}
+.mini .rulemark{margin-inline:auto}
+.mini .sec__lede{margin-inline:auto}
+.mini__act{margin-top:2rem;display:flex;justify-content:center;gap:.85rem;flex-wrap:wrap}
+.wide-art{position:relative;aspect-ratio:16/9;max-height:70vh;margin-top:clamp(2.5rem,5vw,4.5rem)}
+.wide-art .frame{position:absolute;inset:0}
+
+/* --- 6.7 care ---------------------------------------------------------- */
+.care{position:relative;overflow:hidden}
+.care__art{position:absolute;inset:0;z-index:0}
+.care__art .frame{position:absolute;inset:0}
+.care__in{position:relative;z-index:3}
+.care__cols{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(1.5rem,4vw,4rem);align-items:start}
+@media (max-width:900px){.care__cols{grid-template-columns:1fr}}
+.care__panel{background:var(--plate);border:1px solid rgba(238,242,255,.16);padding:clamp(1.5rem,3vw,2.5rem)}
+.care__panel h2,.care__panel h3,.care__panel p,.care__panel a{color:#EEF2FF}
+.care__panel .sec__lede{color:#C6CFF2}
+.care__contact{margin-top:1.5rem;display:flex;flex-direction:column;gap:.75rem;font-size:var(--t-body)}
+.care__contact a{color:#EEF2FF;border-bottom:2px solid var(--citron);text-decoration:none;padding-bottom:1px;align-self:flex-start;font-weight:600}
+.care__contact a:hover{border-color:#fff}
+.care__panel .terms{color:#C6CFF2;border-color:rgba(238,242,255,.4)}
+
+/* --- 6.8 close: banner over horizon art -------------------------------- */
+.close{position:relative;min-height:clamp(460px,56vw,640px);display:grid}
+.close__art{position:absolute;inset:0;z-index:0}
+.close__art .frame{position:absolute;inset:0}
+.close__in{
+  position:relative;z-index:3;align-self:center;width:100%;
+  max-width:var(--wrap);margin-inline:auto;padding-inline:var(--gut);
+  display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(1.5rem,4vw,4rem);align-items:end;
+}
+@media (max-width:900px){.close__in{grid-template-columns:1fr;align-items:start}}
+.close h2{font-size:var(--t-h2)}
+.close p{color:#C6CFF2;margin-top:1.15rem;max-width:52ch}
+.close__act{display:flex;flex-direction:column;gap:1rem;align-items:flex-start}
+.close__alt{display:flex;flex-direction:column;gap:.6rem;font-size:var(--t-small)}
+.close__alt a{color:#EEF2FF;text-decoration:none;border-bottom:1px solid rgba(238,242,255,.4);padding-bottom:2px}
+.close__alt a:hover{border-color:#fff}
+
+/* =========================================================================
+   7. FOOTER
+   ========================================================================= */
+.foot{background:var(--page-deep);border-top:1px solid var(--rule);padding-block:clamp(3rem,6vw,5rem)}
+.foot__top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:2rem}
+@media (max-width:900px){.foot__top{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.foot__top{grid-template-columns:1fr}}
+.foot h2{font-size:.82rem;font-family:var(--mono);letter-spacing:.14em;color:var(--ink-2);font-weight:700;margin-bottom:1rem}
+.foot ul{display:flex;flex-direction:column;gap:.6rem}
+.foot a{color:var(--ink);text-decoration:none;font-size:var(--t-small);border-bottom:1px solid transparent}
+.foot a:hover{border-color:var(--accent-line)}
+.foot__age{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.foot__age strong{font-size:1.05rem}
+.foot__note{color:var(--ink-2);font-size:var(--t-small);max-width:46ch}
+.foot__base{
+  margin-top:clamp(2.5rem,5vw,4rem);padding-top:1.5rem;border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;gap:1rem 2rem;justify-content:space-between;
+  color:var(--ink-2);font-size:var(--t-small);
+}
+
+/* =========================================================================
+   8. MOTION
+   Justifications, one line each:
+   - hero entry stagger: establishes reading order, headline before action.
+   - section reveal: the page is a route, so its parts arrive in route order.
+   - art parallax: separates the art plane from the type plane so full-bleed
+     images read as canvas rather than as flat printed bands.
+   - control hover/active: physical feedback on the only things you can press.
+   Everything collapses under prefers-reduced-motion and under the rig switch.
+   ========================================================================= */
+/* Scoped to html.js so nothing is invisible if the script never runs. */
+html.js [data-reveal]{opacity:0;transform:translateY(20px)}
+[data-reveal].is-in{
+  opacity:1;transform:none;
+  transition:opacity .7s var(--ease),transform .7s var(--ease);
+  transition-delay:calc(var(--i,0) * 70ms);
+}
+html.js .hero__copy > *{opacity:0;transform:translateY(16px);animation:rise .8s var(--ease) forwards}
+.hero__copy > *:nth-child(1){animation-delay:.05s}
+.hero__copy > *:nth-child(2){animation-delay:.16s}
+.hero__copy > *:nth-child(3){animation-delay:.27s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+@supports (animation-timeline: view()){
+  @media (prefers-reduced-motion: no-preference){
+    .frame > img[data-gen-slot],.ph{
+      animation:drift linear both;
+      animation-timeline:view();
+      animation-range:cover 0% cover 100%;
+    }
+    @keyframes drift{from{transform:translateY(-3.5%) scale(1.08)}to{transform:translateY(3.5%) scale(1.08)}}
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  [data-reveal]{opacity:1!important;transform:none!important}
+  .hero__copy > *{opacity:1!important;transform:none!important}
+}
+html.sim-reduced *,html.sim-reduced *::before,html.sim-reduced *::after{
+  animation:none!important;transition:none!important;scroll-behavior:auto!important;
+}
+html.sim-reduced [data-reveal]{opacity:1!important;transform:none!important}
+html.sim-reduced .hero__copy > *{opacity:1!important;transform:none!important}
+
+/* =========================================================================
+   9. ABSENT / ALTERNATE STATES
+   b-empty | b-sample   board
+   c-zero  | c-absent | c-sample   public counters
+   r-ok    | r-down    rates configuration
+   ========================================================================= */
+html.b-empty #boardList{display:none}
+html.b-sample #boardEmpty{display:none}
+html.c-absent #counters,html.c-zero #counters{display:none}
+html.c-sample #countersQuiet{display:none}
+html.c-absent #countersQuiet{display:none}
+html.r-ok .r-down{display:none}
+html.r-down .r-ok{display:none}
+
+/* =========================================================================
+   10. DESIGN CHROME: consent-banner simulation + review rig
+   Neither is part of the page. Both exist so the layout can be checked
+   against states the real platform produces.
+   ========================================================================= */
+.cookie{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:var(--panel);border-top:3px solid var(--accent-line);
+  padding:1.5rem var(--gut);
+}
+.cookie__in{max-width:var(--wrap);margin-inline:auto;display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:center}
+.cookie p{font-size:var(--t-small);max-width:70ch;color:var(--ink)}
+.cookie__act{display:flex;gap:.75rem;flex-wrap:wrap}
+.cookie__tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--ink-2);display:block;margin-bottom:.5rem}
+@media (max-width:760px){.cookie__in{grid-template-columns:1fr}}
+
+.rig{
+  position:fixed;left:1rem;bottom:1rem;z-index:70;width:min(310px,calc(100vw - 2rem));
+  background:var(--page-deep);border:2px solid var(--accent-line);
+  box-shadow:0 12px 40px rgba(0,0,0,.4);
+  font-size:.82rem;color:var(--ink);
+}
+.rig__toggle{
+  width:100%;text-align:left;background:var(--citron);color:#0B1338;border:0;
+  font:inherit;font-family:var(--mono);font-weight:700;letter-spacing:.1em;
+  padding:.55rem .75rem;cursor:pointer;
+}
+.rig__body{padding:.85rem .9rem 1rem;max-height:min(62vh,520px);overflow:auto}
+.rig__note{color:var(--ink-2);font-size:.76rem;line-height:1.45;margin-bottom:.9rem}
+.rig fieldset{border:0;padding:0;margin:0 0 .85rem}
+.rig legend{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;color:var(--ink-2);
+  padding:0;margin-bottom:.4rem;font-weight:700;
+}
+.rig label{display:flex;gap:.45rem;align-items:flex-start;padding:.2rem 0;cursor:pointer;line-height:1.4}
+.rig input{accent-color:var(--citron);margin-top:.25rem}
+@media (max-width:760px){.rig{left:.5rem;bottom:.5rem;width:calc(100vw - 1rem)}}
+</style>
+<script>document.documentElement.classList.add("js");</script>
+</head>
+
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="masthead__in">
+    <a class="brand" href="#top" aria-label="Boadman, home">
+      <img src="../../boadman-web/public/boadman-logo.svg" alt="Boadman" width="164" height="55"
+           onerror="this.outerHTML='&lt;span class=&quot;brand__fallback&quot;&gt;BOADMAN&lt;/span&gt;'">
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="navlist">
+        <li><a href="#route">How it works</a></li>
+        <li><a href="#board">Competitions</a></li>
+        <li><a href="#brands">Brands</a></li>
+        <li><a href="#publishers">Publishers</a></li>
+        <li><a href="/faqs">FAQs</a></li>
+      </ul>
+    </nav>
+
+    <div class="masthead__act">
+      <span class="chip" aria-label="Eighteen or over only">18+</span>
+      <a class="btn btn--ghost btn--sm" href="/signin">Sign in</a>
+      <a class="btn btn--primary btn--sm" href="/signup">Create an account</a>
+    </div>
+
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="drawer">
+      <span class="menu-btn__bars" aria-hidden="true"></span> Menu
+    </button>
+  </div>
+
+  <div class="drawer" id="drawer" hidden>
+    <ul class="navlist">
+      <li><a href="#route">How it works</a></li>
+      <li><a href="#board">Competitions</a></li>
+      <li><a href="#brands">Brands</a></li>
+      <li><a href="#publishers">Publishers</a></li>
+      <li><a href="/faqs">FAQs</a></li>
+    </ul>
+    <div class="drawer__act">
+      <a class="btn btn--ghost btn--sm" href="/signin">Sign in</a>
+      <a class="btn btn--primary btn--sm" href="/signup">Create an account</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- =====================================================================
+       HERO. Image as canvas, copy in the left safe area on a 0.92 scrim.
+       ================================================================== -->
+  <section class="hero" id="top" aria-labelledby="h1">
+    <div class="hero__art">
+      <div class="frame">
+<!-- IMAGE-SLOT id="hero-canvas" ratio="21:9" px="2520x1080" prompt="Abstract wide aerial artwork for a competitive gaming platform. A vast plane of compacted cobalt-blue mineral dust seen from high above, and cut across it a single incandescent channel of flowing liquid light running from lower left to upper right. The channel braids into two streams near the centre and passes through three tall panes of clear glass set upright in the plane, where the flow visibly thickens and slows before continuing. The left third of the frame is quiet, deep and almost empty, a calm dark field. Low raking sunlight from the upper right, volumetric haze in the air, fine heavy grain, high chroma, cinematic. Palette strictly deep blue-black 070B24, ultramarine 0B1338, cobalt 1B2FA8, azure 2E6BFF, acid citron D8FF4A in the brightest part of the channel cooling through amber FFA700 into vermilion FF5733 at the far end, with cool porcelain EEF2FF highlights on the glass. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="hero-canvas" src="./generated/two--hero-canvas.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+        <div class="ph ph--hero" aria-hidden="true"></div>
+        <div class="scrim scrim--left" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="hero__body">
+      <div class="hero__grid">
+        <div class="hero__copy">
+          <h1 id="h1">
+            <span class="l">Every step the money takes.</span>
+            <span class="l hot">Every place it can stop.</span>
+          </h1>
+          <p class="hero__sub">Buy coins, stake them on a 1v1 or a tournament, and follow the pot through hold, settlement and payout.</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="/signup">Create an account</a>
+            <a class="btn btn--ghost" href="/signin">Sign in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reserved band. The consent banner lands here on a first visit. -->
+    <div class="hero__reserve" aria-hidden="true"></div>
+  </section>
+
+  <!-- =====================================================================
+       ROUTE. Band art with the headline on it, then a six waypoint rail.
+       ================================================================== -->
+  <section id="route" aria-labelledby="h-route">
+    <div class="band">
+      <div class="frame">
+<!-- IMAGE-SLOT id="route-strata" ratio="21:9" px="2520x1080" prompt="Abstract wide artwork, a museum-lit cutaway cross-section through deep blue mineral strata, as if a canyon wall had been sliced clean and polished. Dozens of horizontal layers in varying densities of blue stone. One continuous seam of glowing acid-green light threads horizontally through every single layer, entering at the left edge and leaving at the right edge, visibly thickening and pooling where it crosses a denser darker band near the centre, then thinning again. Macro detail in the rock, dust motes in the air, soft even museum lighting from the front with one warm accent from the lower right, heavy fine grain, high chroma. Palette strictly deep blue-black 070B24, ultramarine 0B1338, panel blue 141E56, cobalt 1B2FA8, azure 2E6BFF, seam in citron D8FF4A warming to amber FFA700 at the pooling point, porcelain EEF2FF dust highlights. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="route-strata" src="./generated/two--route-strata.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+        <div class="ph ph--route" aria-hidden="true"></div>
+        <div class="scrim scrim--bottom" aria-hidden="true"></div>
+      </div>
+      <div class="band__copy">
+        <div data-reveal>
+          <h2 id="h-route">The route a stake takes</h2>
+          <p class="sec__lede">The match is played in the game itself. Boadman does not run the game. It holds the pot, records the result and pays it out.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap railwrap">
+      <div class="railbar">
+        <p class="railbar__note">Six points on the route. Each one carries what happens, and what happens if it goes against you.</p>
+        <div class="railnav">
+          <button class="arrow arrow--prev" id="railPrev" aria-label="Previous point on the route" aria-controls="rail"><i aria-hidden="true"></i></button>
+          <button class="arrow arrow--next" id="railNext" aria-label="Next point on the route" aria-controls="rail"><i aria-hidden="true"></i></button>
+        </div>
+      </div>
+
+      <ol class="rail" id="rail" tabindex="0" aria-label="The route a stake takes, six points in order, scrollable">
+        <li class="step">
+          <h3>Buy</h3>
+          <p>Coins are bought by card at the current rate and land in your wallet.</p>
+          <p class="step__risk">That is real money converted into coins.</p>
+        </li>
+        <li class="step">
+          <h3>Stake</h3>
+          <p>Entering a 1v1 challenge or a tournament moves the stake out of your wallet straight away.</p>
+          <p class="step__risk">Committed from that moment. You cannot spend or withdraw it.</p>
+        </li>
+        <li class="step">
+          <h3>Hold</h3>
+          <p>From the start of the match until it settles, both stakes sit with Boadman. Neither side can spend, withdraw or re-stake them.</p>
+          <p class="step__risk">Holding is not protection. Lose, and the held stake pays the other player.</p>
+        </li>
+        <li class="step">
+          <h3>Settle</h3>
+          <p>Boadman records the result of the match and the pot pays the winner.</p>
+          <p class="step__risk">Platform commission is deducted from every settled pot.</p>
+        </li>
+        <li class="step">
+          <h3>Mature</h3>
+          <p>A prize is held for 48 hours so other entrants can raise a complaint about cheating. It matures on its own when the window closes.</p>
+          <p class="step__risk">A complaint raised inside the window freezes the prize until an admin rules.</p>
+        </li>
+        <li class="step">
+          <h3>Cash out</h3>
+          <p>Winnings convert back to money and pay to a bank account in the same legal name as the Boadman account.</p>
+          <p class="step__risk">An account in a different name is not paid.</p>
+        </li>
+      </ol>
+
+      <a class="terms" href="/legal/terms">Read the terms</a>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       COINS. First money figure on the page, so the risk line sits in the
+       same block, at body size.
+       ================================================================== -->
+  <section class="sec" id="coins" aria-labelledby="h-coins">
+    <div class="wrap split">
+      <div class="frame" data-reveal>
+<!-- IMAGE-SLOT id="coins-unit" ratio="3:4" px="1440x1920" prompt="Abstract studio macro still life, tall vertical composition. A precise vertical stack of eleven identical rectangular slabs of thick translucent blue glass, each slab exactly the same thickness, resting on a brushed cobalt metal plinth against a deep blue seamless background. Each slab is edge-lit so a thin line of acid-green light runs along its front edge, and a single warm vermilion line refracts diagonally down through the whole stack. Extremely shallow depth of field on the lowest slab, crisp specular highlights, hard single key light from the upper left, cool bounce from the right, fine grain, product photography discipline, high chroma. Palette strictly deep blue-black 070B24, ultramarine 0B1338, cobalt 1B2FA8, azure 2E6BFF, citron D8FF4A edge light, vermilion FF5733 refraction, porcelain EEF2FF speculars. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no discs, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="coins-unit" src="./generated/two--coins-unit.jpg" alt="" width="1440" height="1920" loading="lazy" decoding="async">
+        <div class="ph ph--coins" aria-hidden="true"></div>
+      </div>
+
+      <div data-reveal>
+        <div class="rulemark" aria-hidden="true"></div>
+        <h2 id="h-coins">Coins are the unit</h2>
+        <p class="sec__lede">Everything on the platform is priced in coins. Coins are bought with real money by card, and they are the same unit whether you are entering a competition, taking a pot or cashing out.</p>
+
+        <div class="figure-block">
+          <p class="rate"><span class="num">1</span> coin = <span class="num">10p</span></p>
+          <p class="qual r-ok">That is the current rate. It is set on the server and shown at checkout before you pay.</p>
+          <p class="qual r-down">The current rate is not available on this page right now. It is set on the server and shown at checkout before you pay.</p>
+          <p class="risk">A stake is lost when you lose, and it is not returned. Platform commission is deducted from every settled competition.</p>
+        </div>
+
+        <p class="qual r-ok" style="margin-top:1.25rem;color:var(--ink-2);font-size:var(--t-small)">Commission is configured on the server and shown on a competition page before you enter it.</p>
+        <p class="qual r-down" style="margin-top:1.25rem;color:var(--ink-2);font-size:var(--t-small)">Commission is not available on this page right now. It is shown on a competition page before you enter it.</p>
+
+        <a class="terms" href="/legal/terms">Read the terms</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       BOARD. Renders the platform as it actually is. The rig switches it to
+       sample data so the populated design can be reviewed.
+       ================================================================== -->
+  <section class="sec" id="board" aria-labelledby="h-board">
+    <div class="wrap">
+      <div class="board__head" data-reveal>
+        <div class="sec__head">
+          <div class="rulemark" aria-hidden="true"></div>
+          <h2 id="h-board">The board today</h2>
+          <p class="sec__lede">Competitions are hosted by Boadman or by players. A host puts up part of the prize pool, entrants pay an entry fee into the rest, and the result of the match decides who takes it.</p>
+        </div>
+      </div>
+
+      <div class="artstrip" data-reveal>
+        <div class="frame">
+<!-- IMAGE-SLOT id="board-bays" ratio="21:9" px="2520x1080" prompt="Abstract wide artwork of a vast foundry floor seen from a low angle in deep raking light. The floor is a field of rectangular casting bays sunk into dark blue stone, arranged in a strict grid stretching away into fog, and every single bay is empty, cold, unpoured and dark. One bay at the far right edge catches a thin rim of acid-green light along its lip, the only live thing in the frame. Heavy industrial scale, gritty refractory texture on the bay walls, cold blue atmospheric fog thickening with distance, one hard low light source from the left, heavy fine grain, high chroma restricted to the single lit rim. Palette strictly deep blue-black 070B24, ultramarine 0B1338, panel blue 141E56, cobalt 1B2FA8 in the mid distance, azure 2E6BFF in the fog, one rim of citron D8FF4A, faint amber FFA700 deep in the background haze. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="board-bays" src="./generated/two--board-bays.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+          <div class="ph ph--board" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- Counters. Four public numbers, compacted above 999.
+           Zero is ambiguous on this platform: the endpoint answers with zeros
+           when part of the database is down, so a quiet platform and a broken
+           one look identical. Rather than print four zeros that could mean
+           either thing, the zero state collapses to a sentence.
+           The whole block can also be absent, and nothing depends on its height. -->
+      <ul class="counters" id="counters" data-reveal aria-label="Platform counters">
+        <li><span class="v num">12</span><span class="k">Tournaments live</span></li>
+        <li><span class="v num">£1.5k</span><span class="k">Prizes paid, last 30 days</span></li>
+        <li><span class="v num">3.8k</span><span class="k">Active players, last 30 days</span></li>
+        <li><span class="v num">6</span><span class="k">Supported games</span></li>
+      </ul>
+
+      <p class="quiet-line" id="countersQuiet" data-reveal>Live counters sit here once competitions are running. They are left out rather than shown as zeros, because a zero can also mean the counters are unavailable.</p>
+
+      <!-- Empty board. The real production state today. -->
+      <div class="quiet-state" id="boardEmpty" data-reveal>
+        <p>There is nothing on the board to enter. A game can only be run here once its publisher licenses it, and none has yet.</p>
+        <p><a class="link" href="#publishers">What a publisher unlocks</a></p>
+      </div>
+
+      <!-- Populated board. Cards carry no cover art because no licensed game
+           artwork exists, so the art slot is a typographic field instead. -->
+      <div class="cards" id="boardList" data-reveal>
+        <a class="comp" href="/p/tournament/8f2c41">
+          <div class="comp__art">
+            <span class="comp__state" data-state="live">LIVE</span>
+            <span class="comp__game">CHESS</span>
+          </div>
+          <div class="comp__body">
+            <h3>Sunday ladder final</h3>
+            <dl>
+              <dt>Prize pool</dt><dd>1,250,000 coins</dd>
+              <dt>Host put up</dt><dd>250,000 coins</dd>
+              <dt>Entry</dt><dd>5,000 coins</dd>
+              <dt>Entrants</dt><dd>118 of 128</dd>
+            </dl>
+            <p class="comp__host">Hosted by Boadman</p>
+          </div>
+        </a>
+        <a class="comp" href="/p/tournament/6b19d0">
+          <div class="comp__art">
+            <span class="comp__state" data-state="soon">STARTING SOON</span>
+            <span class="comp__game">GO</span>
+          </div>
+          <div class="comp__body">
+            <h3>Open blitz bracket</h3>
+            <dl>
+              <dt>Prize pool</dt><dd>24,000 coins</dd>
+              <dt>Host put up</dt><dd>4,000 coins</dd>
+              <dt>Entry</dt><dd class="plain">Free entry</dd>
+              <dt>Entrants</dt><dd>41 of 64</dd>
+            </dl>
+            <p class="comp__host">Hosted by Aisha Rahimi, player</p>
+          </div>
+        </a>
+        <a class="comp" href="/p/tournament/2a77e5">
+          <div class="comp__art">
+            <span class="comp__state" data-state="open">OPEN</span>
+            <span class="comp__game">DRAUGHTS</span>
+          </div>
+          <div class="comp__body">
+            <h3>Head to head, best of five</h3>
+            <dl>
+              <dt>Prize pool</dt><dd>900 coins</dd>
+              <dt>Host put up</dt><dd>300 coins</dd>
+              <dt>Entry</dt><dd>300 coins</dd>
+              <dt>Entrants</dt><dd>3 of 4</dd>
+            </dl>
+            <p class="comp__host">Hosted by Kwabena Mensah, player</p>
+          </div>
+        </a>
+      </div>
+
+      <p style="margin-top:1.5rem;max-width:64ch">A stake is lost when you lose, and it is not returned. Platform commission is deducted when a competition settles, and a prize is held for 48 hours before it can be spent.</p>
+      <a class="terms" href="/legal/terms">Read the terms</a>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       STOPS. Full-bleed strip, then five tiles.
+       ================================================================== -->
+  <section id="stops" aria-labelledby="h-stops">
+    <div class="band" style="height:clamp(240px,26vw,380px)">
+      <div class="frame">
+<!-- IMAGE-SLOT id="stops-sluice" ratio="21:9" px="2520x1080" prompt="Abstract wide artwork of an engineered channel seen from a low three quarter angle. A fast river of molten acid-green and amber light runs left to right along a deep cobalt stone channel, and it is arrested mid-flow by a row of five massive cold blue sluice barriers lowered into the channel bed. Upstream of the barriers the light pools, thickens and glows hot against the walls. Downstream the channel bed runs empty, dry and dark blue, with only a faint residual shimmer. Heavy industrial scale, wet stone texture, mist rising where the light meets the barriers, one hard cold key light from the upper left, heavy fine grain, high chroma, cinematic. Palette strictly deep blue-black 070B24, ultramarine 0B1338, cobalt 1B2FA8, azure 2E6BFF on the barriers, citron D8FF4A and amber FFA700 in the pooled light, vermilion FF5733 at the hottest core, porcelain EEF2FF in the mist. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="stops-sluice" src="./generated/two--stops-sluice.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+        <div class="ph ph--stops" aria-hidden="true"></div>
+        <div class="scrim scrim--bottom" aria-hidden="true"></div>
+      </div>
+      <div class="band__copy">
+        <div data-reveal>
+          <h2 id="h-stops">What stops the money</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap" style="padding-top:clamp(2rem,4vw,3.25rem);padding-bottom:var(--stack)">
+      <p class="sec__lede" data-reveal style="margin-top:0">Five things interrupt a payout. All five are part of how the platform works, not exceptions to it.</p>
+
+      <div class="tiles">
+        <article class="tile tile--lead" data-reveal style="--i:0">
+          <h3>You lose the match</h3>
+          <p>The stake pays the other player. Nothing comes back, and there is no partial return.</p>
+        </article>
+        <article class="tile tile--lead" data-reveal style="--i:1">
+          <h3>Someone raises a complaint</h3>
+          <p>A complaint about cheating inside the 48 hour hold freezes the prize until an admin rules on it. The prize cannot be spent while that runs.</p>
+        </article>
+        <article class="tile" data-reveal style="--i:2">
+          <h3>Your complaint does not hold up</h3>
+          <p>A dispute ruled frivolous carries a fee, deducted from whoever filed it.</p>
+        </article>
+        <article class="tile" data-reveal style="--i:3">
+          <h3>A money laundering review opens</h3>
+          <p>Cash out is frozen for as long as the review runs.</p>
+        </article>
+        <article class="tile" data-reveal style="--i:4">
+          <h3>The bank name does not match</h3>
+          <p>Payment goes only to an account in your own legal name. Identity checks come before a first cash out, and again at higher amounts.</p>
+        </article>
+      </div>
+
+      <a class="terms" href="/legal/terms">Read the terms</a>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       BRANDS. Colour blocked diptych, flat cobalt field against the art.
+       ================================================================== -->
+  <section id="brands" aria-labelledby="h-brands">
+    <div class="diptych">
+      <div class="diptych__field">
+        <div data-reveal>
+          <div class="rulemark" aria-hidden="true"></div>
+          <h2 id="h-brands">Fund a prize pool</h2>
+          <p class="sec__lede">Brands put money into prize pools and reach the players competing for it. You choose the competition, you put up the pool, and your name sits on it as the host.</p>
+          <p class="sec__lede">A brand cannot move value of any kind until business verification passes. There is no advisory route around it and no partial access before it clears. Platform commission is deducted when a competition settles, sponsored or not.</p>
+          <div style="margin-top:2rem">
+            <a class="btn btn--key" href="/signup-brand">Create a brand account</a>
+          </div>
+          <a class="terms" href="/legal/terms">Read the terms</a>
+        </div>
+      </div>
+      <div class="frame">
+<!-- IMAGE-SLOT id="brands-pour" ratio="4:3" px="1920x1440" prompt="Abstract industrial artwork, bright and high energy. A broad ribbon of luminous molten vermilion and amber material pours from an unseen height in the upper left down into a wide shallow cobalt basin, where it splashes and immediately divides into three even parallel channels that run away toward the lower right. Crisp frozen splash detail at the point of impact, glowing spray, hard clean studio key light from the right with strong cool fill, saturated and clean rather than smoky, heavy fine grain, high chroma. Palette strictly ultramarine 0B1338 background, cobalt 1B2FA8 basin, azure 2E6BFF in the channels, vermilion FF5733 and amber FFA700 in the pour, a few citron D8FF4A sparks at the impact, porcelain EEF2FF speculars. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="brands-pour" src="./generated/two--brands-pour.jpg" alt="" width="1920" height="1440" loading="lazy" decoding="async">
+        <div class="ph ph--brands" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       PUBLISHERS. Small, quiet section. The art carries the weight.
+       ================================================================== -->
+  <section class="sec" id="publishers" aria-labelledby="h-pub">
+    <div class="wrap">
+      <div class="mini" data-reveal>
+        <div class="rulemark" aria-hidden="true"></div>
+        <h2 id="h-pub">No game runs here without its publisher</h2>
+        <p class="sec__lede">Publishers license their titles to the platform and take a share of platform commission. It is the only way a game can appear on the board. No publisher has onboarded yet, which is why the board is empty and why no competition on this page carries game artwork.</p>
+        <p class="sec__lede">The share is paid out of commission on settled competitions, so it earns only when competitions settle. There is no signup route yet, only a waitlist.</p>
+        <div class="mini__act">
+          <a class="btn btn--key" href="/waitlist/publishers">Join the publisher waitlist</a>
+        </div>
+        <a class="terms" href="/legal/terms">Read the terms</a>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="wide-art" data-reveal>
+        <div class="frame">
+<!-- IMAGE-SLOT id="publishers-seam" ratio="16:9" px="2400x1350" prompt="Abstract monumental artwork. A sheer, colossal ultramarine wall filling the whole frame, its surface finely board-marked concrete, split down the exact centre by a hairline vertical seam that has not opened. Intense acid-green light presses from behind the seam and escapes only as one narrow blade of light and a faint bloom on the wall either side. Fine dust drifts in the escaping beam. Deep shadow across both halves, immense scale, one cold ambient source, heavy fine grain, restrained and still, high chroma only in the seam itself. Palette strictly deep blue-black 070B24, ultramarine 0B1338, panel blue 141E56, cobalt 1B2FA8, seam in citron D8FF4A and porcelain EEF2FF, one faint amber FFA700 warmth at the base of the seam. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no doors, no door handles, no padlocks, no shields, no vaults, no recognisable brand or franchise." -->
+<img data-gen-slot="publishers-seam" src="./generated/two--publishers-seam.jpg" alt="" width="2400" height="1350" loading="lazy" decoding="async">
+          <div class="ph ph--publishers" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       RESPONSIBLE PLAY. Calm art, text on a 0.90 plate.
+       ================================================================== -->
+  <section class="sec care" id="care" aria-labelledby="h-care">
+    <div class="care__art">
+      <div class="frame">
+<!-- IMAGE-SLOT id="care-cooling" ratio="16:9" px="2400x1350" prompt="Abstract calm artwork. A wide still expanse of very deep blue water at complete rest, seen from just above the surface, stretching to a soft horizonless haze. One long low band of warm ember light lies across the water in the upper third, dissolving gradually into the blue and cooling to nothing before it reaches the foreground. No wind, no ripple, glassy surface with only the faintest tonal variation. Soft even diffuse light, low contrast, muted chroma, quiet and restrained compared with a saturated set, heavy fine grain, meditative. Palette strictly deep blue-black 070B24, ultramarine 0B1338, panel blue 141E56, a restrained band of amber FFA700 fading through vermilion FF5733 to nothing, porcelain EEF2FF in the haze. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no boats, no recognisable brand or franchise." -->
+<img data-gen-slot="care-cooling" src="./generated/two--care-cooling.jpg" alt="" width="2400" height="1350" loading="lazy" decoding="async">
+        <div class="ph ph--care" aria-hidden="true"></div>
+        <div class="scrim scrim--full" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="wrap care__in">
+      <div class="care__cols">
+        <div class="care__panel" data-reveal>
+          <div class="rulemark" aria-hidden="true" style="background:var(--citron)"></div>
+          <h2 id="h-care">Playing with money you can lose</h2>
+          <p class="sec__lede">Boadman is for people aged 18 or over. Once coins are bought, the money has left your account, and a lost stake is gone.</p>
+          <p class="sec__lede">Boadman has no deposit limits, no loss limits, no session reminders and no self exclusion. The only control that exists today is a manual account suspension, which you request by email.</p>
+          <a class="terms" href="/legal/responsible-play">Responsible play</a>
+        </div>
+
+        <div class="care__panel" data-reveal style="--i:1">
+          <h3 style="font-size:var(--t-h3)">Independent help</h3>
+          <p class="sec__lede" style="margin-top:.75rem">GamCare is free, confidential and independent of Boadman.</p>
+          <div class="care__contact">
+            <a href="tel:08088020133">0808 8020 133</a>
+            <a href="https://www.gamcare.org.uk" rel="noopener noreferrer">gamcare.org.uk</a>
+          </div>
+          <p class="sec__lede" style="margin-top:1.5rem;font-size:var(--t-small)">To have an account suspended, email compliance.</p>
+          <div class="care__contact">
+            <a href="mailto:compliance@boadman.com">compliance@boadman.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       CLOSE. Banner over horizon art.
+       ================================================================== -->
+  <section class="close" aria-labelledby="h-close">
+    <div class="close__art">
+      <div class="frame">
+<!-- IMAGE-SLOT id="close-horizon" ratio="21:9" px="2520x1080" prompt="Abstract wide landscape artwork. An immense flat cobalt-blue plain of fine cracked mineral crust meeting a dead straight low horizon in the lower third of the frame. Along that horizon line runs one narrow continuous band of citron and vermilion light, as though a seam were burning just below the edge of the world. The upper two thirds are an enormous quiet gradient of deep blue sky with a faint haze and no clouds. Vast negative space, extreme stillness, one distant light source at the horizon, heavy fine grain, cinematic, high chroma only along the horizon band. Palette strictly deep blue-black 070B24, ultramarine 0B1338, panel blue 141E56, cobalt 1B2FA8, azure 2E6BFF near the horizon, band in citron D8FF4A through amber FFA700 into vermilion FF5733, porcelain EEF2FF in the haze. Negative: no video game characters, no weapons, no armour, no vehicles, no maps, no HUD or interface elements, no logos, no wordmarks, no letters, no numbers, no text of any kind, no people, no faces, no hands, no crowds, no stadiums, no trophies, no coins, no banknotes, no currency symbols, no dice, no cards, no padlocks, no shields, no vaults, no buildings, no recognisable brand or franchise." -->
+<img data-gen-slot="close-horizon" src="./generated/two--close-horizon.jpg" alt="" width="2520" height="1080" loading="lazy" decoding="async">
+        <div class="ph ph--close" aria-hidden="true"></div>
+        <div class="scrim scrim--bottom" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="close__in">
+      <div data-reveal>
+        <h2 id="h-close">Accounts are open. The board is not.</h2>
+        <p>You can create an account today. Card payments are still waiting on processor approval, so no deposits or payouts are running yet, and nothing is staked until they are.</p>
+      </div>
+      <div class="close__act" data-reveal style="--i:1">
+        <a class="btn btn--primary" href="/signup">Create an account</a>
+        <div class="close__alt">
+          <a href="/signup-brand">Create a brand account</a>
+          <a href="/waitlist/publishers">Join the publisher waitlist</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot__top">
+      <div>
+        <div class="foot__age">
+          <span class="chip chip--fill">18+</span>
+          <strong>Aged 18 or over only</strong>
+        </div>
+        <p class="foot__note">Boadman does not run the games. Competitions are played in the game itself. Boadman holds the pot, records the result and pays it out, minus commission.</p>
+      </div>
+      <nav aria-labelledby="f-acct">
+        <h2 id="f-acct">Accounts</h2>
+        <ul>
+          <li><a href="/signup">Create an account</a></li>
+          <li><a href="/signin">Sign in</a></li>
+          <li><a href="/signup-brand">Create a brand account</a></li>
+          <li><a href="/waitlist/publishers">Join the publisher waitlist</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="f-legal">
+        <h2 id="f-legal">Legal</h2>
+        <ul>
+          <li><a href="/legal/terms">Terms</a></li>
+          <li><a href="/legal/privacy">Privacy</a></li>
+          <li><a href="/legal/cookies">Cookies</a></li>
+          <li><a href="/legal/responsible-play">Responsible play</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="f-help">
+        <h2 id="f-help">Help</h2>
+        <ul>
+          <li><a href="/faqs">FAQs</a></li>
+          <li><a href="mailto:support@boadman.com">support@boadman.com</a></li>
+          <li><a href="mailto:compliance@boadman.com">compliance@boadman.com</a></li>
+          <li><a href="https://www.gamcare.org.uk" rel="noopener noreferrer">GamCare, 0808 8020 133</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="foot__base">
+      <span>Boadman</span>
+      <span>A stake is lost when you lose. Commission is deducted on settlement.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- DESIGN CHROME. Simulation of the real consent banner, which covers roughly
+     180 to 260px of the first viewport on a first anonymous visit. -->
+<section class="cookie" id="cookieSim" role="region" aria-label="Consent banner simulation, design chrome" hidden>
+  <div class="cookie__in">
+    <div>
+      <span class="cookie__tag">SIMULATION, DESIGN CHROME</span>
+      <p>Boadman uses cookies that keep you signed in and measure how the site is used. You can accept all, reject the optional ones, or choose which are set. Full detail is in the cookie policy.</p>
+    </div>
+    <div class="cookie__act">
+      <button class="btn btn--ghost btn--sm" type="button">Choose</button>
+      <button class="btn btn--ghost btn--sm" type="button">Reject optional</button>
+      <button class="btn btn--primary btn--sm" type="button">Accept all</button>
+    </div>
+  </div>
+</section>
+
+<!-- DESIGN CHROME. Review rig. -->
+<aside class="rig" id="rig" aria-label="Design review rig">
+  <button class="rig__toggle" id="rigToggle" aria-expanded="true" aria-controls="rigBody">REVIEW RIG</button>
+  <div class="rig__body" id="rigBody">
+    <p class="rig__note">Design chrome, not part of the page. It switches the page between states the platform genuinely produces. Sample data is design fixture only.</p>
+
+    <fieldset>
+      <legend>BOARD</legend>
+      <label><input type="radio" name="board" value="b-empty" checked> Empty, no licensed game (live state)</label>
+      <label><input type="radio" name="board" value="b-sample"> Populated (sample data)</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>PUBLIC COUNTERS</legend>
+      <label><input type="radio" name="counters" value="c-zero" checked> All zero, collapsed to a sentence (live state)</label>
+      <label><input type="radio" name="counters" value="c-absent"> Absent, backend failed</label>
+      <label><input type="radio" name="counters" value="c-sample"> Populated (sample data)</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>RATES CONFIG</legend>
+      <label><input type="radio" name="rates" value="r-ok" checked> Readable</label>
+      <label><input type="radio" name="rates" value="r-down"> Unreadable, figures withheld</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>OVERLAYS</legend>
+      <label><input type="checkbox" id="simCookie"> Consent banner over the first viewport</label>
+      <label><input type="checkbox" id="simReduced"> Force reduced motion</label>
+    </fieldset>
+  </div>
+</aside>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+
+  /* --- mobile navigation. Fixes the live build having none below 1024px. --- */
+  var menuBtn = document.getElementById("menuBtn");
+  var drawer = document.getElementById("drawer");
+  menuBtn.addEventListener("click", function () {
+    var open = menuBtn.getAttribute("aria-expanded") === "true";
+    menuBtn.setAttribute("aria-expanded", String(!open));
+    drawer.hidden = open;
+  });
+  drawer.addEventListener("click", function (e) {
+    if (e.target.tagName === "A") {
+      menuBtn.setAttribute("aria-expanded", "false");
+      drawer.hidden = true;
+    }
+  });
+
+  /* --- scroll reveal. IntersectionObserver only, no scroll listeners. --- */
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var targets = document.querySelectorAll("[data-reveal]");
+  function showAll() {
+    for (var i = 0; i < targets.length; i++) targets[i].classList.add("is-in");
+  }
+  if (reduced.matches || !("IntersectionObserver" in window)) {
+    showAll();
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.15 });
+    for (var j = 0; j < targets.length; j++) io.observe(targets[j]);
+  }
+  reduced.addEventListener("change", function (e) { if (e.matches) showAll(); });
+
+  /* --- route rail. Arrow state comes from an observer on the end cards,
+         so no scroll handler is needed anywhere on the page. --- */
+  var rail = document.getElementById("rail");
+  var prev = document.getElementById("railPrev");
+  var next = document.getElementById("railNext");
+  function stepBy(dir) {
+    var card = rail.querySelector(".step");
+    if (!card) return;
+    var w = card.getBoundingClientRect().width + 1;
+    rail.scrollBy({ left: dir * w, behavior: reduced.matches || root.classList.contains("sim-reduced") ? "auto" : "smooth" });
+  }
+  prev.addEventListener("click", function () { stepBy(-1); });
+  next.addEventListener("click", function () { stepBy(1); });
+
+  if ("IntersectionObserver" in window) {
+    var steps = rail.querySelectorAll(".step");
+    var first = steps[0], last = steps[steps.length - 1];
+    var edgeIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.target === first) prev.disabled = entry.intersectionRatio > 0.9;
+        if (entry.target === last) next.disabled = entry.intersectionRatio > 0.9;
+      });
+    }, { root: rail, threshold: [0, 0.9, 1] });
+    edgeIO.observe(first);
+    edgeIO.observe(last);
+  }
+
+  /* --- review rig --- */
+  var rigToggle = document.getElementById("rigToggle");
+  var rigBody = document.getElementById("rigBody");
+  rigToggle.addEventListener("click", function () {
+    var open = rigToggle.getAttribute("aria-expanded") === "true";
+    rigToggle.setAttribute("aria-expanded", String(!open));
+    rigBody.hidden = open;
+  });
+
+  function bindGroup(name, classes) {
+    var inputs = document.querySelectorAll('input[name="' + name + '"]');
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].addEventListener("change", function (e) {
+        classes.forEach(function (c) { root.classList.remove(c); });
+        root.classList.add(e.target.value);
+        // A display:none block never intersects, so a block revealed by the
+        // rig would stay at opacity 0. Settle every reveal on a state change.
+        showAll();
+      });
+    }
+  }
+  bindGroup("board", ["b-empty", "b-sample"]);
+  bindGroup("counters", ["c-zero", "c-absent", "c-sample"]);
+  bindGroup("rates", ["r-ok", "r-down"]);
+
+  document.getElementById("simCookie").addEventListener("change", function (e) {
+    document.getElementById("cookieSim").hidden = !e.target.checked;
+  });
+  document.getElementById("simReduced").addEventListener("change", function (e) {
+    root.classList.toggle("sim-reduced", e.target.checked);
+    if (e.target.checked) showAll();
+  });
+})();
+</script>
+</body>
+</html>
