@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boadman · The match decides</title>
+<meta name="description" content="Boadman is a competition platform for video game players, 18+. Buy coins, stake them in 1v1 challenges and tournaments, and cash winnings out to a bank account in your own legal name.">
+<style>
+/* ==========================================================================
+   BOADMAN · DIRECTION A
+   Style #6 · Bold Big-Type Editorial. Fashion-poster typography applied to a
+   competition platform. The page is built as a printed issue: a cover plate,
+   a data band, numbered features, full-bleed plates, a colophon.
+   Colour worlds rotate per section. Three inks, two paper stocks.
+   ========================================================================== */
+
+:root{
+  /* --- the ink set --- */
+  --ink:      #0E0D0C;   /* warm black, the primary field */
+  --ink-lift: #171613;   /* card / panel on ink */
+  --oxblood:  #3A0C06;   /* committed dark-warm field, one section only */
+
+  /* --- the paper stocks --- */
+  --bone:  #F4EFE7;      /* the working white. never pure #fff */
+  --kraft: #E3DCCC;      /* second stock, warmer and one step down */
+
+  /* --- the single accent, in three legible weights --- */
+  --verm:      #F03B12;  /* accent on ink and as a flood.  4.92:1 on ink */
+  --verm-deep: #B32209;  /* accent text on paper.          5.84:1 on bone */
+  --verm-lift: #FF6A3D;  /* accent text on oxblood.        5.98:1 on oxblood */
+
+  /* --- muted text, all verified >= 4.5:1 on their own field --- */
+  --mute-on-ink:     #B0AA9D;
+  --mute-on-bone:    #56503F;
+  --mute-on-kraft:   #4F493B;
+  --mute-on-oxblood: #CAC3B5;
+
+  --hair-bone: rgba(244,239,231,.24);
+  --hair-ink:  rgba(14,13,12,.20);
+
+  --ring: var(--verm);
+
+  /* Poster face. Wide heavy grotesque, never a condensed one: at 180px an
+     ultra-condensed fallback closes its own counters and the word stops
+     reading. Arial Black is the guaranteed floor on Windows and macOS. */
+  --f-display: "Archivo Expanded","Archivo Black","Archivo","Anton","Arial Black","Helvetica Neue","Segoe UI Black","Nimbus Sans Bold",sans-serif;
+  --f-body: Inter,"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --f-label: Bahnschrift,"Archivo","Segoe UI",Inter,"Helvetica Neue",Arial,sans-serif;
+  --f-serif: "Playfair Display","Bodoni MT",Didot,"Didot LT STD","Hoefler Text","Big Caslon","Palatino Linotype",Georgia,"Times New Roman",serif;
+  --f-mono: "JetBrains Mono","IBM Plex Mono",Consolas,"SF Mono",Menlo,monospace;
+
+  --pad: clamp(20px, 4.4vw, 68px);
+  --nav-h: 72px;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+body{
+  margin:0; background:var(--ink); color:var(--bone);
+  font-family:var(--f-body); font-size:16px; line-height:1.56;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+img{ display:block; max-width:100%; }
+a{ color:inherit; }
+
+:focus-visible{
+  outline:3px solid var(--ring);
+  outline-offset:3px;
+  border-radius:2px;
+}
+
+.wrap{ max-width:1320px; margin-inline:auto; padding-inline:var(--pad); }
+.bleed{ width:100%; }
+
+/* ---------- colour worlds ---------- */
+.world{ position:relative; }
+.w-ink{     background:var(--ink);     color:var(--bone); }
+.w-bone{    background:var(--bone);    color:var(--ink);  --ring:var(--verm); }
+.w-kraft{   background:var(--kraft);   color:var(--ink);  --ring:var(--verm-deep); }
+.w-verm{    background:var(--verm);    color:var(--ink);  --ring:var(--ink); }
+.w-oxblood{ background:var(--oxblood); color:var(--bone); --ring:var(--verm-lift); }
+
+/* ---------- editorial type system ---------- */
+.poster{
+  font-family:var(--f-display);
+  font-weight:900;
+  text-transform:uppercase;
+  line-height:.86;
+  letter-spacing:-.022em;
+  margin:0;
+}
+h1.poster{ font-size:clamp(3rem, 12.6vw, 12rem); }
+.h-full{ font-size:clamp(2.5rem, 8vw, 6.5rem); }
+.h-half{ font-size:clamp(1.9rem, 4vw, 3.3rem); letter-spacing:-.018em; }
+/* headline that owns one half of a two column spread */
+.h-col{ font-size:clamp(2.2rem, 5.2vw, 4.4rem); letter-spacing:-.02em; }
+.poster span{ display:block; }
+
+.kicker{
+  font-family:var(--f-serif);
+  font-style:italic;
+  font-size:clamp(1.15rem, 2.2vw, 1.85rem);
+  line-height:1.28;
+  letter-spacing:.004em;
+  margin:0;
+}
+
+.label{
+  font-family:var(--f-label);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  line-height:1.4;
+  margin:0;
+}
+.folio{
+  font-family:var(--f-display);
+  font-size:clamp(2.4rem,4.2vw,3.6rem);
+  line-height:1;
+  letter-spacing:-.04em;
+}
+
+p{ margin:0 0 1em; }
+.body{ font-size:16px; line-height:1.6; max-width:62ch; }
+.body-sm{ font-size:14px; line-height:1.62; max-width:74ch; }
+.mute-ink{ color:var(--mute-on-ink); }
+.mute-bone{ color:var(--mute-on-bone); }
+.mute-kraft{ color:var(--mute-on-kraft); }
+.mute-ox{ color:var(--mute-on-oxblood); }
+
+.num{
+  font-family:var(--f-display); font-weight:900;
+  font-variant-numeric:tabular-nums lining-nums;
+  font-feature-settings:"tnum" 1,"lnum" 1;
+  letter-spacing:-.02em;
+}
+.unit{
+  font-family:var(--f-label); font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase;
+}
+
+/* ---------- links ---------- */
+.tlink{
+  font-family:var(--f-label); font-size:12px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase;
+  text-decoration:none; border-bottom:2px solid currentColor;
+  padding-bottom:2px; display:inline-block;
+}
+.tlink:hover{ color:var(--verm); }
+.w-bone .tlink:hover,.w-kraft .tlink:hover{ color:var(--verm-deep); }
+.w-verm .tlink:hover{ opacity:.62; }
+.w-oxblood .tlink:hover{ color:var(--verm-lift); }
+
+.inline-link{ color:inherit; text-underline-offset:3px; text-decoration-thickness:1px; }
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.6em;
+  font-family:var(--f-label); font-size:14px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; text-decoration:none;
+  padding:17px 30px; border-radius:3px; border:2px solid transparent;
+  transition:background-color .18s ease, color .18s ease, transform .18s ease;
+  cursor:pointer;
+}
+/* Ink on vermilion measures 4.92:1. White on vermilion measures 3.93:1 and is
+   the same failure the current build ships, so it is not used anywhere here. */
+.btn-fill{ background:var(--verm); color:var(--ink); }
+.btn-fill:hover{ background:var(--bone); color:var(--ink); }
+.btn-ghost{ background:transparent; color:var(--bone); border-color:var(--hair-bone); }
+.btn-ghost:hover{ border-color:var(--bone); background:var(--bone); color:var(--ink); }
+.w-bone .btn-ghost,.w-kraft .btn-ghost{ color:var(--ink); border-color:var(--hair-ink); }
+.w-bone .btn-ghost:hover,.w-kraft .btn-ghost:hover{ background:var(--ink); color:var(--bone); border-color:var(--ink); }
+.btn-ink{ background:var(--ink); color:var(--bone); }
+.btn-ink:hover{ background:var(--bone); color:var(--ink); }
+
+/* ==========================================================================
+   MASTHEAD
+   ========================================================================== */
+.masthead{
+  position:sticky; top:0; z-index:60;
+  background:rgba(14,13,12,.93);
+  border-bottom:1px solid var(--hair-bone);
+}
+@supports (backdrop-filter:blur(8px)){
+  .masthead{ backdrop-filter:blur(10px) saturate(140%); }
+}
+.masthead .wrap{
+  height:var(--nav-h); display:flex; align-items:center; gap:24px;
+}
+.logo{ width:132px; height:44px; flex:none; }
+.logo-link{ display:block; line-height:0; }
+.mast-nav{ margin-left:auto; display:flex; align-items:center; gap:26px; }
+/* :not(.btn) matters: without it this rule wins on specificity and repaints
+   the primary call to action in muted grey on vermilion, at 1.70:1. */
+.mast-nav a:not(.btn){
+  font-family:var(--f-label); font-size:12px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase; text-decoration:none;
+  color:var(--mute-on-ink);
+}
+.mast-nav a:not(.btn):hover{ color:var(--bone); }
+.mast-nav .btn{ padding:13px 22px; }
+.age-chip{
+  font-family:var(--f-label); font-size:12px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase;
+  border:1.5px solid var(--verm); color:var(--verm);
+  padding:5px 10px; border-radius:2px; white-space:nowrap;
+}
+.burger{
+  display:none; margin-left:auto; background:none; border:1px solid var(--hair-bone);
+  color:var(--bone); padding:10px 14px; border-radius:3px;
+  font-family:var(--f-label); font-size:12px; font-weight:700; letter-spacing:.2em;
+  text-transform:uppercase; cursor:pointer;
+}
+.sheet{
+  position:fixed; inset:0; z-index:70; background:var(--ink);
+  display:none; flex-direction:column; padding:var(--pad);
+  overflow-y:auto;
+}
+.sheet[data-open="true"]{ display:flex; }
+.sheet-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:36px; }
+.sheet a.sheet-item{
+  font-family:var(--f-display); font-weight:900; text-transform:uppercase;
+  font-size:clamp(2rem,10vw,3rem); line-height:1.02; letter-spacing:-.03em;
+  text-decoration:none; padding:10px 0; border-bottom:1px solid var(--hair-bone);
+  display:block;
+}
+.sheet a.sheet-item:hover{ color:var(--verm); }
+.sheet-foot{ margin-top:auto; padding-top:28px; }
+
+.skip{
+  position:absolute; left:-9999px; top:0; z-index:99;
+  background:var(--verm); color:var(--ink); padding:12px 18px;
+  font-family:var(--f-label); font-size:13px; letter-spacing:.16em; text-transform:uppercase;
+}
+.skip:focus{ left:0; }
+
+/* ==========================================================================
+   01 · THE COVER
+   ========================================================================== */
+/* The cover stops short of the fold on purpose: the top of Plate 01 has to
+   break the first viewport, and the cookie banner claims the bottom 180 to
+   260px on a first visit, where only image now sits. */
+.cover{
+  min-height:70vh; min-height:70svh;
+  display:flex; flex-direction:column;
+  padding-top:clamp(22px,3.4vh,42px);
+}
+.cover-rule{
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+  border-bottom:1px solid var(--hair-bone); padding-bottom:12px; margin-bottom:clamp(16px,2.6vh,30px);
+  flex-wrap:wrap;
+}
+.cover-rule .label{ color:var(--mute-on-ink); }
+.cover-rule .label b{ color:var(--verm); font-weight:700; }
+.cover-rule .hot{ color:var(--verm); }
+
+h1.poster .l1{ color:var(--bone); }
+h1.poster .l2{ color:var(--verm); }
+.cover-tail{
+  display:flex; align-items:flex-end; gap:clamp(12px,2.4vw,34px); flex-wrap:wrap;
+}
+.cover-tail .kicker{
+  color:var(--mute-on-ink); padding-bottom:.5em;
+  flex:1 1 240px; min-width:220px; max-width:30ch;
+}
+
+.cover-row{
+  display:flex; gap:clamp(20px,4vw,60px); align-items:flex-end; justify-content:space-between;
+  flex-wrap:wrap;
+  margin-top:auto; padding-top:clamp(20px,3.2vh,38px);
+  padding-bottom:clamp(20px,3vh,34px);
+}
+.cover-row .body{ max-width:52ch; margin:0; }
+.cover-cta{ display:flex; gap:12px; flex-wrap:wrap; flex:0 1 auto; min-width:0; }
+
+.cover-plate img{
+  width:100%; height:clamp(200px,34vh,360px); object-fit:cover; object-position:50% 14%;
+}
+
+/* cost + risk, one block, all at body size */
+.cost-strip{ border-top:1px solid var(--hair-bone); }
+.cost-strip .wrap{ padding-block:clamp(26px,3.4vw,42px); }
+.cost-grid{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(22px,3.4vw,54px);
+}
+.cost-grid .label{ color:var(--verm); margin-bottom:12px; }
+.cost-grid p{ font-size:16px; line-height:1.58; margin:0 0 12px; }
+.plate-cap{
+  display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  padding:12px 0 0; color:var(--mute-on-ink);
+}
+
+/* ==========================================================================
+   02 · COUNTER BAND (vermilion flood)
+   ========================================================================== */
+.band{ padding-block:clamp(38px,6vw,66px); }
+.band-head{
+  display:flex; justify-content:space-between; align-items:baseline; gap:18px;
+  flex-wrap:wrap; border-bottom:2px solid var(--ink); padding-bottom:14px; margin-bottom:clamp(22px,3vw,34px);
+}
+.counters{
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(16px,2.4vw,34px);
+}
+.counter{ border-top:1px solid rgba(14,13,12,.32); padding-top:14px; }
+.counter .num{ font-size:clamp(2.3rem,5.1vw,4.4rem); display:block; line-height:.92; }
+.counter .label{ margin-top:10px; }
+.band-note{ margin-top:clamp(24px,3vw,34px); max-width:88ch; font-size:14px; line-height:1.6; }
+
+/* ==========================================================================
+   03 · TWO PLAYERS, ONE POT
+   ========================================================================== */
+.plate-wide img{
+  width:100%; height:clamp(240px,50vh,540px); object-fit:cover; object-position:50% 46%;
+}
+.sec{ padding-block:clamp(56px,8vw,120px); }
+.sec-split{
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:clamp(30px,5vw,84px); align-items:start;
+}
+.sec-head .label{ margin-bottom:16px; }
+.sec-head .folio{ display:block; color:var(--verm-deep); margin-bottom:8px; }
+.w-ink .sec-head .folio,.w-oxblood .sec-head .folio{ color:var(--verm); }
+.w-oxblood .sec-head .folio{ color:var(--verm-lift); }
+.sec-head .kicker{ margin-top:20px; max-width:26ch; }
+
+.steps{ list-style:none; margin:0; padding:0; counter-reset:s; }
+.steps li{
+  display:grid; grid-template-columns:64px minmax(0,1fr); gap:clamp(14px,2vw,26px);
+  padding:20px 0; border-top:1px solid var(--hair-ink);
+}
+.steps li:last-child{ border-bottom:1px solid var(--hair-ink); }
+.steps .sn{
+  font-family:var(--f-display); font-weight:900; font-size:1.4rem;
+  color:var(--verm-deep); letter-spacing:-.02em; padding-top:2px;
+  font-variant-numeric:tabular-nums;
+}
+.steps h3{
+  font-family:var(--f-label); font-size:13px; font-weight:700; letter-spacing:.22em;
+  text-transform:uppercase; margin:0 0 7px;
+}
+.steps p{ margin:0; font-size:15px; line-height:1.58; }
+.sec-foot{
+  margin-top:clamp(26px,3.4vw,40px); padding-top:18px; border-top:2px solid currentColor;
+  display:flex; gap:22px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+}
+
+/* ==========================================================================
+   04 · THE BOARD
+   ========================================================================== */
+.board-head{
+  display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);
+  gap:clamp(24px,4vw,64px); align-items:end; margin-bottom:clamp(26px,3.4vw,42px);
+}
+.sample-strip{
+  background:var(--ink); color:var(--bone);
+  padding:16px 20px; border-radius:4px;
+  display:flex; gap:16px; align-items:flex-start;
+  margin-bottom:clamp(22px,3vw,32px);
+}
+.sample-tag{
+  font-family:var(--f-label); font-size:12px; font-weight:700; letter-spacing:.2em;
+  text-transform:uppercase; background:var(--verm); color:var(--ink);
+  padding:5px 10px; border-radius:2px; white-space:nowrap; flex:none;
+}
+.sample-strip p{ margin:0; font-size:14px; line-height:1.55; color:var(--mute-on-ink); }
+
+.filters{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:clamp(20px,2.6vw,30px); }
+.filters button{
+  font-family:var(--f-label); font-size:12px; font-weight:700; letter-spacing:.18em;
+  text-transform:uppercase; padding:11px 17px; border-radius:3px;
+  border:1.5px solid var(--hair-ink); background:transparent; color:var(--ink);
+  cursor:pointer; transition:background-color .16s, color .16s, border-color .16s;
+}
+.filters button:hover{ border-color:var(--ink); }
+.filters button[aria-pressed="true"]{ background:var(--ink); color:var(--bone); border-color:var(--ink); }
+
+.cards{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(18px,2.4vw,30px); }
+.card{
+  background:var(--ink-lift); color:var(--bone);
+  border-radius:5px; overflow:hidden; display:flex; flex-direction:column;
+  transition:transform .22s ease;
+}
+.card:hover{ transform:translateY(-4px); }
+.card-img{ position:relative; overflow:hidden; aspect-ratio:16/9; background:#000; }
+.card-img img{ width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
+.card:hover .card-img img{ transform:scale(1.045); }
+.card-chips{ position:absolute; left:14px; top:14px; display:flex; gap:8px; flex-wrap:wrap; }
+.chip{
+  font-family:var(--f-label); font-size:12px; font-weight:700; letter-spacing:.18em;
+  text-transform:uppercase; padding:6px 10px; border-radius:2px;
+}
+.chip-live{ background:var(--verm); color:var(--ink); }
+.chip-open{ background:var(--bone); color:var(--ink); }
+.chip-soon{ background:rgba(14,13,12,.82); color:var(--bone); border:1px solid var(--hair-bone); }
+.chip-sample{ background:rgba(14,13,12,.82); color:var(--bone); border:1px solid var(--verm); }
+
+.card-body{ padding:clamp(18px,2vw,26px); display:flex; flex-direction:column; flex:1; }
+.card-body h3{
+  font-family:var(--f-display); font-weight:900; text-transform:uppercase;
+  font-size:clamp(1.3rem,2vw,1.75rem); line-height:.98; letter-spacing:-.02em; margin:0 0 10px;
+}
+.card-meta{
+  font-family:var(--f-label); font-size:13px; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--mute-on-ink); margin-bottom:18px;
+}
+.pool{ border-top:1px solid var(--hair-bone); padding-top:16px; }
+.pool .label{ color:var(--mute-on-ink); }
+.pool .num{ font-size:clamp(1.9rem,3.1vw,2.6rem); line-height:1; display:block; margin-top:8px; color:var(--verm); }
+.pool .unit{ font-size:13px; color:var(--bone); margin-left:.4em; letter-spacing:.16em; }
+.figs{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px;
+  margin-top:18px; padding-top:16px; border-top:1px solid var(--hair-bone);
+}
+.fig .label{ color:var(--mute-on-ink); font-size:12px; letter-spacing:.14em; }
+.fig .v{
+  display:block; margin-top:6px; font-size:15px; font-weight:700;
+  font-variant-numeric:tabular-nums lining-nums;
+}
+.card-cta{ margin-top:auto; padding-top:20px; }
+.board-foot{
+  margin-top:clamp(26px,3.4vw,40px); padding-top:20px; border-top:2px solid var(--ink);
+  display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
+  gap:clamp(20px,3vw,44px); align-items:start;
+}
+.count-live{ font-size:14px; }
+
+/* ==========================================================================
+   MARQUEE RULE
+   ========================================================================== */
+.marq{
+  border-block:1px solid var(--hair-bone);
+  overflow:hidden; padding-block:clamp(14px,1.8vw,22px);
+}
+.marq-track{
+  display:flex; gap:0; width:max-content;
+  animation:slide 34s linear infinite;
+}
+.marq span{
+  font-family:var(--f-display); font-weight:900; text-transform:uppercase;
+  font-size:clamp(1.6rem,3.4vw,3rem); letter-spacing:-.02em; line-height:1;
+  padding-right:.5em; white-space:nowrap; color:var(--verm);
+}
+.marq span em{ font-style:normal; color:var(--bone); }
+@keyframes slide{ from{ transform:translate3d(0,0,0);} to{ transform:translate3d(-50%,0,0);} }
+
+/* ==========================================================================
+   05 · THE HOLD (oxblood)
+   ========================================================================== */
+.hold-head{ margin-bottom:clamp(30px,4vw,52px); }
+.hold-head .h-full .l2{ color:var(--verm-lift); }
+.balance{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(24px,4vw,72px);
+}
+.balance > div{ border-top:2px solid var(--bone); padding-top:18px; }
+.balance h3{
+  font-family:var(--f-label); font-size:13px; font-weight:700; letter-spacing:.24em;
+  text-transform:uppercase; margin:0 0 16px;
+}
+.balance ul{ list-style:none; margin:0; padding:0; }
+.balance li{
+  font-size:15px; line-height:1.56; padding:13px 0;
+  border-bottom:1px solid rgba(244,239,231,.16);
+}
+.balance li:last-child{ border-bottom:0; }
+
+/* ==========================================================================
+   06 · THREE SIGNATURES
+   ========================================================================== */
+.sig{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:stretch; }
+.sig-img{ position:relative; min-height:420px; }
+.sig-img img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:28% 50%; }
+.sig-body{ padding:clamp(46px,6vw,96px) var(--pad); }
+.sig-body .h-half .l2{ color:var(--verm); }
+.ledger{ margin-top:clamp(28px,3.4vw,44px); }
+.ledger-item{ border-top:1px solid var(--hair-bone); padding:22px 0; display:grid; grid-template-columns:58px minmax(0,1fr); gap:18px; }
+.ledger-item:last-child{ border-bottom:1px solid var(--hair-bone); }
+.ledger-item .n{ font-family:var(--f-display); font-weight:900; font-size:1.35rem; color:var(--verm); letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+.ledger-item h3{
+  font-family:var(--f-display); font-weight:900; text-transform:uppercase;
+  font-size:clamp(1.3rem,2.1vw,1.85rem); line-height:1; letter-spacing:-.022em; margin:0 0 10px;
+}
+.ledger-item.lead h3{ font-size:clamp(1.6rem,2.9vw,2.5rem); }
+.ledger-item p{ font-size:15px; line-height:1.58; margin:0 0 14px; }
+
+/* ==========================================================================
+   07 · RESPONSIBLE PLAY
+   ========================================================================== */
+.rp{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(30px,5vw,84px); align-items:start; }
+.rp-card{
+  border:2px solid var(--ink); border-radius:4px; padding:clamp(22px,2.6vw,34px);
+  background:var(--bone);
+}
+.rp-card .label{ color:var(--verm-deep); margin-bottom:14px; }
+.rp-org{
+  font-family:var(--f-display); font-weight:900; text-transform:uppercase;
+  font-size:clamp(2rem,3.6vw,3rem); letter-spacing:-.028em; line-height:.94; margin:0 0 16px;
+}
+.rp-lines{ list-style:none; margin:0 0 18px; padding:0; }
+.rp-lines li{ padding:11px 0; border-top:1px solid var(--hair-ink); font-size:16px; }
+.rp-lines li:first-child{ border-top:0; }
+.rp-lines a{ font-weight:700; }
+
+/* ==========================================================================
+   COLOPHON
+   ========================================================================== */
+.colophon{ padding-block:clamp(52px,6vw,86px); }
+.colo-top{ display:grid; grid-template-columns:minmax(0,1.1fr) repeat(4,minmax(0,1fr)); gap:clamp(20px,2.6vw,40px); }
+.colo-col h3{ font-family:var(--f-label); font-size:12px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; margin:0 0 14px; color:var(--verm); }
+.colo-col ul{ list-style:none; margin:0; padding:0; }
+.colo-col li{ margin-bottom:9px; }
+.colo-col a{ font-size:15px; text-decoration:none; color:var(--mute-on-ink); }
+.colo-col a:hover{ color:var(--bone); text-decoration:underline; text-underline-offset:3px; }
+.colo-brand .logo{ width:164px; height:55px; margin-bottom:18px; }
+.colo-bottom{
+  margin-top:clamp(34px,4vw,54px); padding-top:22px; border-top:1px solid var(--hair-bone);
+  display:flex; gap:20px; justify-content:space-between; flex-wrap:wrap; align-items:flex-start;
+}
+.colo-bottom p{ margin:0; font-size:14px; line-height:1.6; max-width:78ch; color:var(--mute-on-ink); }
+.colo-bottom .age-chip{ flex:none; }
+
+/* ==========================================================================
+   No scroll-triggered reveals. Every block is legible the moment it paints,
+   in print capture, with JavaScript off, and on a screen reader.
+   ========================================================================== */
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width:1080px){
+  .counters{ grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:26px; }
+  .board-head{ grid-template-columns:1fr; align-items:start; }
+  .colo-top{ grid-template-columns:repeat(3,minmax(0,1fr)); row-gap:34px; }
+  .colo-brand{ grid-column:1 / -1; }
+}
+@media (max-width:900px){
+  .mast-nav{ display:none; }
+  .burger{ display:inline-block; }
+  .cover-grid{ grid-template-columns:1fr; }
+  .sec-split{ grid-template-columns:1fr; }
+  .cards{ grid-template-columns:1fr; }
+  .balance{ grid-template-columns:1fr; }
+  .sig{ grid-template-columns:1fr; }
+  .sig-img{ min-height:300px; }
+  .sig-body{ padding-inline:var(--pad); }
+  .rp{ grid-template-columns:1fr; }
+  .board-foot{ grid-template-columns:1fr; }
+  .cost-grid{ grid-template-columns:1fr; }
+  .cover-row{ align-items:flex-start; }
+  .cover-cta{ flex:1 1 100%; }
+  .btn{ flex:1 1 auto; }
+}
+@media (max-width:620px){
+  .figs{ grid-template-columns:1fr 1fr; }
+  .colo-top{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .steps li{ grid-template-columns:40px minmax(0,1fr); }
+  .sample-strip{ flex-direction:column; gap:12px; }
+  .cover-plate img{ height:clamp(180px,28vh,260px); }
+}
+
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+
+  .marq-track{ animation:none !important; width:auto; }
+  .card:hover{ transform:none; }
+  .card:hover .card-img img{ transform:none; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <symbol id="bmLogo" viewBox="0 0 164 55">
+    <g clip-path="url(#bmc0)">
+      <path d="M44.8777 31.1463V20.1519C44.8777 20.1519 44.8282 19.9155 44.7291 19.4426C44.6364 18.9698 44.4755 18.6687 44.2587 18.5183C44.0297 18.3892 43.8875 18.3141 43.8319 18.2819C43.7824 18.2496 43.7514 18.2388 43.7514 18.2388L44.426 17.8197H53.8145C53.8145 17.8197 54.1735 17.8626 54.8916 17.9379C55.6156 18.013 56.2407 18.4752 56.7731 19.3351C57.2929 20.2161 57.6332 20.9794 57.7943 21.6242C57.9616 22.2584 58.0418 22.5808 58.0418 22.5808L55.591 25.4718C55.591 25.4718 56.2223 26.2135 57.4848 27.6858C58.7535 29.1474 59.4529 30.4373 59.6015 31.5549C59.7438 32.6619 59.5211 33.9194 58.9208 35.3057C58.3205 36.6813 57.3982 37.6486 56.1543 38.1967C53.7714 39.2928 51.2465 39.8732 48.5728 39.9485C45.9055 40.013 43.5103 39.8301 41.3936 39.3897C42.1673 39.2713 43.1946 39.1102 44.4759 38.9382C45.7569 38.7556 47.063 38.5298 48.3873 38.2398C49.7118 37.9603 50.9309 37.6272 52.0512 37.2404C53.1652 36.8533 53.9451 36.3698 54.3783 35.8001C55.2386 34.6931 55.5604 33.5325 55.3562 32.3289C55.152 31.1143 54.8735 30.3191 54.5209 29.9109C54.162 29.5347 53.481 28.7179 52.4849 27.4603C51.4883 26.2028 50.9871 25.5689 50.9871 25.5689L54.9975 23.054C54.9975 23.054 54.7128 22.5918 54.1433 21.6784C53.5738 20.7649 52.986 20.2705 52.3855 20.1847C51.7668 20.1203 50.8137 20.0985 49.5263 20.1203C48.2389 20.1418 47.5955 20.1525 47.5955 20.1525V36.8428L44.8785 31.147L44.8777 31.1463ZM75.284 26.4819C75.8535 30.4693 75.1541 33.7256 73.1796 36.2296C71.2116 38.7338 69.1382 39.8621 66.96 39.615C65.5488 39.4646 64.2924 38.6478 63.1908 37.154C62.0891 35.6708 61.4455 33.3388 61.2536 30.1682C61.1175 28.1693 61.3774 25.9769 62.0335 23.5909C62.6832 21.1943 63.0114 20.0013 63.0114 20.0013L62.1759 17.8197C63.1538 17.8197 64.1438 17.8088 65.1404 17.7766C66.1368 17.7444 67.127 17.7766 68.1049 17.8519C69.4477 17.9808 70.7723 18.3999 72.0781 19.0985C73.384 19.8079 74.4298 20.9685 75.2097 22.6128C75.2097 22.6128 75.1292 22.6343 74.9683 22.6881C74.8074 22.7417 74.6465 22.8385 74.4856 22.989C74.3186 23.1609 74.3867 23.6231 74.696 24.3862C75.0055 25.1601 75.2035 25.8587 75.284 26.4819ZM68.7608 20.4741C67.5726 20.4741 66.5639 21.2802 65.722 22.9138C64.8804 24.5366 64.4595 26.4928 64.4595 28.7819C64.4595 31.071 64.8804 33.027 65.722 34.6391C66.5639 36.2512 67.5724 37.068 68.7608 37.068C69.9429 37.068 70.9578 36.2512 71.7933 34.6391C72.6349 33.027 73.0558 31.071 73.0558 28.7819C73.0558 26.4928 72.6349 24.5366 71.7933 22.9138C70.9578 21.2802 69.9429 20.4741 68.7608 20.4741ZM80.9593 53.6614C80.9593 53.6614 80.7118 53.2315 80.2166 52.3825C79.7214 51.5334 79.1831 50.3727 78.6013 48.9004C78.0258 47.4281 77.506 45.73 77.0541 43.7847C76.6021 41.8395 76.3979 39.7651 76.4474 37.562C76.5525 33.1555 76.9055 29.8239 77.4994 27.5672C78.0874 25.3103 78.5888 23.752 78.9848 22.8921C79.3686 22.0753 79.6843 21.4734 79.9194 21.0865C80.1546 20.6997 80.2166 20.2482 80.1113 19.7433C79.9999 19.2596 79.839 18.8834 79.6286 18.5932C79.4183 18.3137 79.313 18.1741 79.313 18.1741H90.3727C90.3727 18.1741 90.2303 18.389 89.9518 18.8189C89.6733 19.2489 89.5124 19.7217 89.4629 20.2484C89.395 20.7965 89.3763 21.28 89.4071 21.6993C89.4443 22.1184 89.4629 22.3226 89.4629 22.3226V36.3692C89.4629 36.3692 89.4814 36.6916 89.5124 37.3257C89.5432 37.9706 89.6546 38.4112 89.8467 38.6369C90.0386 38.8947 90.2116 39.1527 90.3602 39.4213C90.5149 39.7008 90.5892 39.8297 90.5892 39.8297H85.3844C85.3844 39.8297 85.5763 39.6364 85.9663 39.2493C86.35 38.8625 86.5852 38.4647 86.6718 38.0672C86.7584 37.6697 86.8079 37.3257 86.8266 37.0353C86.8453 36.7345 86.8514 36.5947 86.8514 36.5947V29.0073H81.7579L82.3212 26.9224H86.5854V19.7433C86.4122 19.6789 85.9232 19.8184 85.1064 20.1408C84.2894 20.4632 83.4167 21.3229 82.4946 22.7092C81.5662 24.0958 80.7184 26.1807 79.9447 28.975C79.171 31.7585 78.7564 35.5846 78.6944 40.4316C78.5151 44.2684 78.843 47.4387 79.6908 49.9216C80.5388 52.4149 80.9595 53.6614 80.9595 53.6614H80.9593ZM92.347 19.8722C92.3841 19.4316 92.2975 19.0231 92.0808 18.647C91.8705 18.2708 91.7032 18.0021 91.5856 17.8517C91.5856 17.8517 91.9632 17.8517 92.7244 17.8517C93.4856 17.8517 94.3521 17.8517 95.3174 17.8408C96.289 17.83 97.2111 17.8195 98.0962 17.8195C98.9752 17.8195 99.5384 17.8302 99.7797 17.8517C101.123 17.9806 102.447 18.3997 103.753 19.0983C105.053 19.8077 106.099 20.9683 106.885 22.6126C106.885 22.6126 106.804 22.6341 106.643 22.6879C106.482 22.7415 106.322 22.8383 106.161 22.9888C105.994 23.1607 106.062 23.6229 106.371 24.3859C106.68 25.1599 106.872 25.8585 106.959 26.4817C107.312 29.0181 107.2 31.1461 106.625 32.8549C106.049 34.5743 105.257 35.9394 104.242 36.9496C103.227 37.9706 102.107 38.6692 100.894 39.0667C99.6806 39.4535 98.6163 39.5824 97.694 39.4535C96.9451 39.3891 95.7443 39.3891 94.092 39.4535C92.4457 39.518 91.6227 39.5502 91.6227 39.5502C91.6227 39.5502 91.6351 39.5611 91.6537 39.5611C91.6784 39.572 91.7775 39.4429 91.9445 39.1742C92.1054 38.9165 92.2107 38.5187 92.2663 37.9814C92.3158 37.4333 92.3468 37.1538 92.3468 37.1538V19.8724L92.347 19.8722ZM95.7014 20.3128V37.3473C95.7014 37.3473 96.4626 37.3366 97.9914 37.3151C99.5199 37.2937 100.479 37.0786 100.869 36.6489C101.253 36.2512 101.841 35.499 102.627 34.3918C103.413 33.2741 103.754 31.3503 103.642 28.6206C103.475 24.5688 102.646 22.0862 101.166 21.1512C99.6874 20.2161 97.8617 19.9366 95.7016 20.3128H95.7014ZM120.179 22.8921C120.432 22.387 120.55 22.1506 120.538 22.1722C121.856 19.9046 123.583 18.6685 125.705 18.4752C127.834 18.271 129.79 18.1743 131.566 18.1743C131.566 18.1743 131.424 18.3892 131.145 18.8192C130.867 19.2491 130.706 19.7219 130.656 20.2486C130.595 20.7967 130.582 21.2802 130.613 21.6995C130.644 22.1186 130.656 22.3228 130.656 22.3228V36.3694C130.656 36.3694 130.675 36.6918 130.706 37.3259C130.731 37.9708 130.854 38.4114 131.059 38.6371C131.251 38.8949 131.418 39.1529 131.566 39.4215C131.708 39.701 131.783 39.8299 131.783 39.8299H126.578C126.578 39.8299 126.77 39.6366 127.16 39.2495C127.543 38.8627 127.785 38.465 127.884 38.0674C127.958 37.6699 128.001 37.3259 128.02 37.0355C128.038 36.7347 128.044 36.5949 128.044 36.5949L128.119 19.7435C127.029 20.0013 126.051 20.6354 125.179 21.6564C124.312 22.6668 123.588 23.6876 123.007 24.7194C122.425 25.7511 122.01 26.5893 121.756 27.2343C121.503 27.89 121.459 27.9542 121.626 27.4276C121.88 28.6206 122.109 30.05 122.32 31.7158C122.524 33.371 122.654 35.3164 122.716 37.5624C122.765 39.7655 122.555 41.8399 122.09 43.7851C121.626 45.7302 121.1 47.4285 120.525 48.9008C119.943 50.3731 119.405 51.5338 118.916 52.3829C118.427 53.2319 118.185 53.6618 118.185 53.6618C118.185 53.6618 118.606 52.4151 119.442 49.922C120.283 47.4391 120.617 44.269 120.45 40.4321C120.376 35.585 119.937 31.7589 119.126 28.9754C118.315 26.1813 117.43 24.0962 116.459 22.7096C115.493 21.3233 114.583 20.4636 113.729 20.1412C112.881 19.8186 112.38 19.6791 112.238 19.7437L112.287 36.5951C112.287 36.5951 112.294 36.7349 112.306 37.0357C112.318 37.3259 112.374 37.6699 112.473 38.0676C112.541 38.4652 112.783 38.8629 113.179 39.2497C113.575 39.6368 113.779 39.8301 113.779 39.8301H108.555C108.555 39.8301 108.63 39.7012 108.772 39.4217C108.921 39.1531 109.094 38.8951 109.298 38.6373C109.49 38.4116 109.608 37.971 109.645 37.3261C109.682 36.692 109.7 36.3696 109.7 36.3696V22.323C109.7 22.323 109.713 22.1188 109.731 21.6997C109.756 21.2804 109.744 20.7969 109.7 20.2488C109.626 19.7222 109.453 19.2493 109.187 18.8194C108.927 18.3894 108.791 18.1745 108.791 18.1745H119.832C119.832 18.1745 119.727 18.3143 119.516 18.5936C119.306 18.8838 119.145 19.2598 119.034 19.7437C118.928 20.2488 118.99 20.7003 119.225 21.0869C119.461 21.4738 119.776 22.0757 120.178 22.8925L120.179 22.8921ZM137 53.6614C137 53.6614 136.753 53.2315 136.257 52.3825C135.762 51.5334 135.224 50.3727 134.642 48.9004C134.067 47.4281 133.547 45.73 133.095 43.7847C132.643 41.8395 132.439 39.7651 132.488 37.562C132.593 33.1555 132.946 29.8239 133.54 27.5672C134.129 25.3103 134.63 23.752 135.026 22.8921C135.41 22.0753 135.725 21.4734 135.96 21.0865C136.195 20.6997 136.257 20.2482 136.152 19.7433C136.041 19.2596 135.88 18.8834 135.67 18.5932C135.459 18.3137 135.354 18.1741 135.354 18.1741H146.414C146.414 18.1741 146.271 18.389 145.993 18.8189C145.714 19.2489 145.553 19.7217 145.504 20.2484C145.436 20.7965 145.417 21.28 145.448 21.6993C145.485 22.1184 145.504 22.3226 145.504 22.3226V36.3692C145.504 36.3692 145.522 36.6916 145.553 37.3257C145.584 37.9706 145.695 38.4112 145.888 38.6369C146.079 38.8947 146.253 39.1527 146.401 39.4213C146.556 39.7008 146.63 39.8297 146.63 39.8297H141.425C141.425 39.8297 141.617 39.6364 142.007 39.2493C142.391 38.8625 142.626 38.4647 142.712 38.0672C142.799 37.6697 142.849 37.3257 142.867 37.0353C142.885 36.7345 142.892 36.5947 142.892 36.5947V29.0073H137.798L138.362 26.9224H142.626V19.7433C142.453 19.6789 141.964 19.8184 141.147 20.1408C140.33 20.4632 139.457 21.3229 138.535 22.7092C137.607 24.0958 136.759 26.1807 135.985 28.975C135.212 31.7585 134.797 35.5846 134.735 40.4316C134.556 44.2684 134.884 47.4387 135.732 49.9216C136.579 52.4149 137 53.6614 137 53.6614H137ZM159.726 39.787C159.905 36.2095 159.171 32.5913 158.47 28.975C157.918 26.1289 156.842 24.0958 155.92 22.7092C154.998 21.3231 154.125 20.4632 153.308 20.1408C152.491 19.8182 152.015 19.6786 151.866 19.7433L151.94 36.5947L152.101 38.0672C152.138 38.4863 152.367 38.884 152.782 39.2709C153.203 39.6471 153.407 39.8297 153.407 39.8297H147.843C147.843 39.8297 147.917 39.7008 148.06 39.4213C148.208 39.1527 148.381 38.8947 148.586 38.6369C148.778 38.4112 148.895 37.9706 148.932 37.3257C148.969 36.6916 148.982 36.3692 148.982 36.3692V22.3226C148.982 22.3226 148.994 22.1184 149.019 21.6993C149.044 21.28 149.031 20.7965 148.982 20.2484C148.914 19.7217 148.74 19.2489 148.474 18.8189C148.208 18.389 148.078 18.1741 148.078 18.1741H155.387L159.249 20.4417C158.569 20.8392 158.358 21.3229 158.612 21.8818C159.627 24.3 160.419 26.5244 160.988 28.5666C161.558 30.5978 162.076 33.5955 162.003 37.562L161.963 39.7825C161.217 39.784 160.472 39.7856 159.726 39.787H159.726Z" fill="black" stroke="#FF5733" stroke-width="3.97936" stroke-miterlimit="2.61313"/>
+      <mask id="bmm0" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="41" y="17" width="122" height="37">
+        <path d="M44.8777 31.1459V20.1514C44.8777 20.1514 44.8282 19.915 44.7291 19.4421C44.6364 18.9693 44.4755 18.6682 44.2587 18.5178C44.0297 18.3887 43.8875 18.3136 43.8319 18.2814C43.7824 18.2492 43.7514 18.2383 43.7514 18.2383L44.426 17.8192H53.8145C53.8145 17.8192 54.1735 17.8621 54.8916 17.9374C55.6156 18.0125 56.2407 18.4747 56.7731 19.3346C57.2929 20.2156 57.6332 20.9789 57.7943 21.6237C57.9616 22.2579 58.0418 22.5803 58.0418 22.5803L55.591 25.4713C55.591 25.4713 56.2223 26.213 57.4848 27.6853C58.7535 29.1469 59.4529 30.4368 59.6015 31.5545C59.7438 32.6615 59.5211 33.9189 58.9208 35.3052C58.3205 36.6808 57.3982 37.6481 56.1543 38.1962C53.7714 39.2924 51.2465 39.8727 48.5728 39.9481C45.9055 40.0125 43.5103 39.8296 41.3936 39.3892C42.1673 39.2708 43.1946 39.1097 44.4759 38.9377C45.7569 38.7551 47.063 38.5293 48.3873 38.2393C49.7118 37.9598 50.9309 37.6267 52.0512 37.2399C53.1652 36.8528 53.9451 36.3693 54.3783 35.7996C55.2386 34.6926 55.5604 33.532 55.3562 32.3284C55.152 31.1138 54.8735 30.3186 54.5209 29.9104C54.162 29.5342 53.481 28.7174 52.4849 27.4598C51.4883 26.2023 50.9871 25.5684 50.9871 25.5684L54.9975 23.0535C54.9975 23.0535 54.7128 22.5914 54.1433 21.6779C53.5738 20.7644 52.986 20.27 52.3855 20.1842C51.7668 20.1198 50.8137 20.0981 49.5263 20.1198C48.2389 20.1414 47.5955 20.152 47.5955 20.152V36.8423L44.8785 31.1465L44.8777 31.1459ZM75.284 26.4814C75.8535 30.4688 75.1541 33.7252 73.1796 36.2291C71.2116 38.7333 69.1382 39.8617 66.96 39.6146C65.5488 39.4641 64.2924 38.6473 63.1908 37.1535C62.0891 35.6703 61.4455 33.3383 61.2536 30.1677C61.1175 28.1688 61.3774 25.9764 62.0335 23.5904C62.6832 21.1938 63.0114 20.0008 63.0114 20.0008L62.1759 17.8192C63.1538 17.8192 64.1438 17.8083 65.1404 17.7761C66.1368 17.7439 67.127 17.7761 68.1049 17.8514C69.4477 17.9803 70.7723 18.3994 72.0781 19.098C73.384 19.8075 74.4298 20.968 75.2097 22.6123C75.2097 22.6123 75.1292 22.6338 74.9683 22.6876C74.8074 22.7412 74.6465 22.838 74.4856 22.9885C74.3186 23.1605 74.3867 23.6226 74.696 24.3857C75.0055 25.1596 75.2035 25.8582 75.284 26.4814ZM68.7608 20.4736C67.5726 20.4736 66.5639 21.2798 65.722 22.9134C64.8804 24.5361 64.4595 26.4923 64.4595 28.7814C64.4595 31.0705 64.8804 33.0266 65.722 34.6386C66.5639 36.2507 67.5724 37.0675 68.7608 37.0675C69.9429 37.0675 70.9578 36.2507 71.7933 34.6386C72.6349 33.0266 73.0558 31.0705 73.0558 28.7814C73.0558 26.4923 72.6349 24.5361 71.7933 22.9134C70.9578 21.2798 69.9429 20.4736 68.7608 20.4736ZM80.9593 53.6609C80.9593 53.6609 80.7118 53.231 80.2166 52.382C79.7214 51.5329 79.1831 50.3722 78.6013 48.8999C78.0258 47.4276 77.506 45.7295 77.0541 43.7842C76.6021 41.839 76.3979 39.7646 76.4474 37.5615C76.5525 33.155 76.9055 29.8234 77.4994 27.5667C78.0874 25.3098 78.5888 23.7515 78.9848 22.8916C79.3686 22.0748 79.6843 21.4729 79.9194 21.086C80.1546 20.6992 80.2166 20.2477 80.1113 19.7428C79.9999 19.2591 79.839 18.8829 79.6286 18.5927C79.4183 18.3132 79.313 18.1736 79.313 18.1736H90.3727C90.3727 18.1736 90.2303 18.3885 89.9518 18.8185C89.6733 19.2484 89.5124 19.7213 89.4629 20.2479C89.395 20.796 89.3763 21.2795 89.4071 21.6988C89.4443 22.1179 89.4629 22.3221 89.4629 22.3221V36.3687C89.4629 36.3687 89.4814 36.6911 89.5124 37.3252C89.5432 37.9701 89.6546 38.4107 89.8467 38.6364C90.0386 38.8942 90.2116 39.1522 90.3602 39.4208C90.5149 39.7003 90.5892 39.8292 90.5892 39.8292H85.3844C85.3844 39.8292 85.5763 39.6359 85.9663 39.2488C86.35 38.862 86.5852 38.4643 86.6718 38.0667C86.7584 37.6692 86.8079 37.3252 86.8266 37.0349C86.8453 36.734 86.8514 36.5942 86.8514 36.5942V29.0068H81.7579L82.3212 26.9219H86.5854V19.7428C86.4122 19.6784 85.9232 19.8179 85.1064 20.1403C84.2894 20.4627 83.4167 21.3224 82.4946 22.7088C81.5662 24.0953 80.7184 26.1802 79.9447 28.9745C79.171 31.758 78.7564 35.5841 78.6944 40.4312C78.5151 44.2679 78.843 47.4382 79.6908 49.9211C80.5388 52.4144 80.9595 53.6609 80.9595 53.6609H80.9593ZM92.347 19.8717C92.3841 19.4311 92.2975 19.0227 92.0808 18.6465C91.8705 18.2703 91.7032 18.0017 91.5856 17.8512C91.5856 17.8512 91.9632 17.8512 92.7244 17.8512C93.4856 17.8512 94.3521 17.8512 95.3174 17.8403C96.289 17.8295 97.2111 17.819 98.0962 17.819C98.9752 17.819 99.5384 17.8297 99.7797 17.8512C101.123 17.9801 102.447 18.3992 103.753 19.0978C105.053 19.8072 106.099 20.9678 106.885 22.6121C106.885 22.6121 106.804 22.6336 106.643 22.6874C106.482 22.741 106.322 22.8378 106.161 22.9883C105.994 23.1603 106.062 23.6224 106.371 24.3855C106.68 25.1594 106.872 25.858 106.959 26.4812C107.312 29.0176 107.2 31.1456 106.625 32.8544C106.049 34.5738 105.257 35.9389 104.242 36.9491C103.227 37.9701 102.107 38.6687 100.894 39.0662C99.6806 39.453 98.6163 39.5819 97.694 39.453C96.9451 39.3886 95.7443 39.3886 94.092 39.453C92.4457 39.5175 91.6227 39.5497 91.6227 39.5497C91.6227 39.5497 91.6351 39.5606 91.6537 39.5606C91.6784 39.5715 91.7775 39.4424 91.9445 39.1737C92.1054 38.916 92.2107 38.5182 92.2663 37.981C92.3158 37.4328 92.3468 37.1533 92.3468 37.1533V19.8719L92.347 19.8717ZM95.7014 20.3123V37.3468C95.7014 37.3468 96.4626 37.3361 97.9914 37.3146C99.5199 37.2932 100.479 37.0782 100.869 36.6484C101.253 36.2507 101.841 35.4985 102.627 34.3913C103.413 33.2737 103.754 31.3498 103.642 28.6201C103.475 24.5683 102.646 22.0857 101.166 21.1507C99.6874 20.2156 97.8617 19.9361 95.7016 20.3123H95.7014ZM120.179 22.8916C120.432 22.3865 120.55 22.1501 120.538 22.1717C121.856 19.9041 123.583 18.668 125.705 18.4747C127.834 18.2705 129.79 18.1738 131.566 18.1738C131.566 18.1738 131.424 18.3887 131.145 18.8187C130.867 19.2486 130.706 19.7215 130.656 20.2481C130.595 20.7962 130.582 21.2798 130.613 21.699C130.644 22.1181 130.656 22.3223 130.656 22.3223V36.3689C130.656 36.3689 130.675 36.6913 130.706 37.3255C130.731 37.9703 130.854 38.4109 131.059 38.6367C131.251 38.8944 131.418 39.1524 131.566 39.421C131.708 39.7006 131.783 39.8294 131.783 39.8294H126.578C126.578 39.8294 126.77 39.6361 127.16 39.2491C127.543 38.8622 127.785 38.4645 127.884 38.0669C127.958 37.6694 128.001 37.3255 128.02 37.0351C128.038 36.7342 128.044 36.5944 128.044 36.5944L128.119 19.743C127.029 20.0008 126.051 20.6349 125.179 21.6559C124.312 22.6663 123.588 23.6871 123.007 24.719C122.425 25.7506 122.01 26.5888 121.756 27.2338C121.503 27.8895 121.459 27.9537 121.626 27.4271C121.88 28.6201 122.109 30.0495 122.32 31.7154C122.524 33.3705 122.654 35.3159 122.716 37.5619C122.765 39.765 122.555 41.8394 122.09 43.7846C121.626 45.7297 121.1 47.428 120.525 48.9003C119.943 50.3726 119.405 51.5333 118.916 52.3824C118.427 53.2314 118.185 53.6613 118.185 53.6613C118.185 53.6613 118.606 52.4146 119.442 49.9215C120.283 47.4386 120.617 44.2685 120.45 40.4316C120.376 35.5845 119.937 31.7585 119.126 28.975C118.315 26.1808 117.43 24.0957 116.459 22.7092C115.493 21.3228 114.583 20.4632 113.729 20.1407C112.881 19.8181 112.38 19.6786 112.238 19.7432L112.287 36.5946C112.287 36.5946 112.294 36.7344 112.306 37.0353C112.318 37.3255 112.374 37.6694 112.473 38.0671C112.541 38.4647 112.783 38.8624 113.179 39.2493C113.575 39.6363 113.779 39.8296 113.779 39.8296H108.555C108.555 39.8296 108.63 39.7008 108.772 39.4212C108.921 39.1526 109.094 38.8946 109.298 38.6369C109.49 38.4111 109.608 37.9705 109.645 37.3257C109.682 36.6915 109.7 36.3691 109.7 36.3691V22.3225C109.7 22.3225 109.713 22.1183 109.731 21.6992C109.756 21.28 109.744 20.7964 109.7 20.2483C109.626 19.7217 109.453 19.2488 109.187 18.8189C108.927 18.3889 108.791 18.174 108.791 18.174H119.832C119.832 18.174 119.727 18.3138 119.516 18.5931C119.306 18.8833 119.145 19.2593 119.034 19.7432C118.928 20.2483 118.99 20.6998 119.225 21.0864C119.461 21.4733 119.776 22.0752 120.178 22.892L120.179 22.8916ZM137 53.6609C137 53.6609 136.753 53.231 136.257 52.382C135.762 51.5329 135.224 50.3722 134.642 48.8999C134.067 47.4276 133.547 45.7295 133.095 43.7842C132.643 41.839 132.439 39.7646 132.488 37.5615C132.593 33.155 132.946 29.8234 133.54 27.5667C134.129 25.3098 134.63 23.7515 135.026 22.8916C135.41 22.0748 135.725 21.4729 135.96 21.086C136.195 20.6992 136.257 20.2477 136.152 19.7428C136.041 19.2591 135.88 18.8829 135.67 18.5927C135.459 18.3132 135.354 18.1736 135.354 18.1736H146.414C146.414 18.1736 146.271 18.3885 145.993 18.8185C145.714 19.2484 145.553 19.7213 145.504 20.2479C145.436 20.796 145.417 21.2795 145.448 21.6988C145.485 22.1179 145.504 22.3221 145.504 22.3221V36.3687C145.504 36.3687 145.522 36.6911 145.553 37.3252C145.584 37.9701 145.695 38.4107 145.888 38.6364C146.079 38.8942 146.253 39.1522 146.401 39.4208C146.556 39.7003 146.63 39.8292 146.63 39.8292H141.425C141.425 39.8292 141.617 39.6359 142.007 39.2488C142.391 38.862 142.626 38.4643 142.712 38.0667C142.799 37.6692 142.849 37.3252 142.867 37.0349C142.885 36.734 142.892 36.5942 142.892 36.5942V29.0068H137.798L138.362 26.9219H142.626V19.7428C142.453 19.6784 141.964 19.8179 141.147 20.1403C140.33 20.4627 139.457 21.3224 138.535 22.7088C137.607 24.0953 136.759 26.1802 135.985 28.9745C135.212 31.758 134.797 35.5841 134.735 40.4312C134.556 44.2679 134.884 47.4382 135.732 49.9211C136.579 52.4144 137 53.6609 137 53.6609H137ZM159.788 39.6964C159.902 36.2587 159.42 32.6742 158.47 28.9748C157.749 26.1666 156.842 24.0955 155.92 22.709C154.998 21.3228 154.125 20.4629 153.308 20.1405C152.491 19.8179 152.015 19.6784 151.866 19.743L151.94 36.5944L152.101 38.0669C152.138 38.486 152.367 38.8837 152.782 39.2706C153.203 39.6468 153.407 39.8294 153.407 39.8294H147.843C147.843 39.8294 147.917 39.7006 148.06 39.421C148.208 39.1524 148.381 38.8944 148.586 38.6367C148.778 38.4109 148.895 37.9703 148.932 37.3255C148.969 36.6913 148.982 36.3689 148.982 36.3689V22.3223C148.982 22.3223 148.994 22.1181 149.019 21.699C149.044 21.2798 149.031 20.7962 148.982 20.2481C148.914 19.7215 148.74 19.2486 148.474 18.8187C148.208 18.3887 148.078 18.1738 148.078 18.1738H155.387L159.249 20.4414C158.569 20.8389 158.358 21.3226 158.612 21.8815C159.627 24.2997 160.419 26.5241 160.988 28.5663C161.558 30.5975 162.075 33.5952 162.003 37.5617L161.963 39.7769C161.238 39.75 160.513 39.7233 159.787 39.6964H159.788Z" fill="white"/>
+      </mask>
+      <g mask="url(#bmm0)">
+        <path d="M167.371 -2.75488H35.8916V57.9811H167.371V-2.75488Z" fill="url(#bmg0)"/>
+      </g>
+    </g>
+    <g clip-path="url(#bmc1)">
+      <path d="M2.83717 19.2965L3.79679 22.8271L27.2711 23.1553L28.2307 19.2965C27.3594 19.6028 25.3695 19.4967 25.7959 20.1779C27.0466 22.1757 25.2857 22.3474 24.9807 22.4632C12.2274 27.3056 17.5453 25.1555 19.2417 4.4929L17.9744 3.50263L15.534 1.5957L13.9245 2.85338L11.8261 4.4929C13.657 26.7911 19.8586 25.2833 2.83731 19.2965H2.83717ZM19.7283 10.8423C19.8322 10.89 19.9347 10.9379 20.0356 10.9859L20.0737 11.004C20.1564 11.0436 20.2381 11.0834 20.3188 11.1232L20.4321 11.1796L20.4661 11.1967L20.4999 11.2138L20.5337 11.231L20.5365 11.2325C26.7938 14.4047 27.3455 18.4873 27.3455 18.4873C26.0582 19.1372 26.6344 27.3873 25.5791 27.9412C13.3431 34.3636 14.411 26.3329 19.7285 10.8423H19.7283ZM27.2803 23.9192L28.1181 27.7964L26.3584 34.2614L26.3155 35.8057L29.7357 43.5435C29.9379 44.2431 29.7203 44.9702 29.1744 45.4063L19.2592 53.3237H11.8086L1.89348 45.4063C1.34742 44.9702 1.13007 44.2431 1.33216 43.5435L4.75226 35.8057L4.7093 34.2614L2.94946 27.7964L3.78729 23.9192H3.78742H27.28H27.2803ZM11.3396 10.8423C11.2356 10.89 11.1333 10.9379 11.0323 10.9859L10.9943 11.004C10.9116 11.0436 10.83 11.0834 10.7491 11.1232L10.6359 11.1796L10.6019 11.1967L10.5681 11.2138L10.5342 11.231L10.5226 11.2369C4.27366 14.4086 3.72238 18.4873 3.72238 18.4873C13.5785 30.3859 24.3135 20.0928 11.3394 10.8422L11.3396 10.8423Z" fill="black" stroke="#FF5733" stroke-width="2.51549" stroke-miterlimit="2.61313"/>
+      <path d="M2.83691 19.2964L3.79653 22.1694L15.5337 25.8468V23.7623L2.83691 19.2964Z" fill="#EFEFF0"/>
+      <path d="M3.78735 23.9191L2.94952 27.7962L4.70936 34.2613L6.98634 36.3328L4.75232 35.8055L1.33222 43.5434C1.12999 44.2429 1.34748 44.9701 1.89354 45.4061L11.8087 53.3236L11.8776 49.748L4.08059 42.6173L11.907 48.2169L11.9701 44.95L8.60793 41.9858C8.57166 41.9538 8.53592 41.9212 8.50086 41.8883C4.90958 38.5193 11.1175 33.6486 11.1177 33.6484C11.1177 33.6484 5.96436 31.1991 6.54093 27.3172C6.54093 27.3172 14.3179 29.2913 14.4955 37.6764L12.6179 41.41L15.5342 44.0367V27.6686L3.78775 23.9189L3.78735 23.9191Z" fill="#EFEFF0"/>
+      <path d="M13.9236 2.85338L14.182 6.69561L13.0926 3.50263L11.8252 4.4929L13.1551 20.6903L15.5332 23.7622V1.5957L13.9236 2.85338Z" fill="#EFEFF0"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M13.9238 2.85338L14.1821 6.69561L13.0928 3.50263L14.2184 20.0342L15.5333 23.7622V1.5957L13.9238 2.85338Z" fill="#D2CFD7"/>
+      <path d="M3.78705 23.9191L2.94922 27.7962L4.70906 34.2613L6.98604 36.3328C3.55631 28.4899 6.31498 25.9831 6.31498 25.9831C16.7534 27.5489 15.2622 38.1364 15.2622 38.1364L14.3675 40.8951L15.5335 44.0367V27.6686L3.78705 23.9189V23.9191Z" fill="#BAB6C1"/>
+      <path d="M11.9075 48.2172L11.9422 46.4153L4.08105 42.6177L11.9075 48.2172Z" fill="url(#bmg1)"/>
+      <path d="M11.3395 10.8423L11.9715 20.2575L12.8635 21.8647L3.72266 18.4874C3.72266 18.4874 4.32011 14.0584 11.3397 10.8423H11.3395Z" fill="#EFEFF0"/>
+      <path d="M12.8639 21.8642L11.9719 20.257L11.3399 10.8418C10.5641 11.1973 9.8709 11.568 9.24414 11.9456L9.67644 19.673L12.8638 21.8642H12.8639Z" fill="#BAB6C1"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M15.5337 25.8468L2.83691 19.2964L15.5337 23.7623V25.8468Z" fill="#D2CFD7"/>
+      <path d="M28.2309 19.2964L27.2712 22.1694L15.5342 25.8468V23.7623L28.2309 19.2964Z" fill="#EFEFF0"/>
+      <path d="M27.2806 23.9191L28.1184 27.7962L26.3587 34.2613L24.0818 36.3328L26.3158 35.8055L29.7359 43.5434C29.9381 44.2429 29.7206 44.9701 29.1747 45.4061L19.2596 53.3236L19.1906 49.748L26.9876 42.6173L19.1611 48.2169L19.0982 44.95L22.4603 41.9858C22.4966 41.9538 22.5323 41.9212 22.5675 41.8883C26.1588 38.5193 19.9508 33.6486 19.9507 33.6484C19.9507 33.6484 25.104 31.1991 24.5276 27.3172C24.5276 27.3172 16.7506 29.2913 16.5729 37.6764L18.4504 41.41L15.5342 44.0367V27.6686L27.2805 23.9189L27.2806 23.9191Z" fill="#EFEFF0"/>
+      <path d="M17.1437 2.85338L16.8854 6.69561L17.9746 3.50263L19.2419 4.4929L17.9121 20.6903L15.5342 23.7622V1.5957L17.1437 2.85338Z" fill="#EFEFF0"/>
+      <path d="M17.1437 2.85338L16.8854 6.69561L17.9746 3.50263L16.849 20.0342L15.5342 23.7622V1.5957L17.1437 2.85338Z" fill="#BAB6C1"/>
+      <path d="M27.2805 23.9191L28.1183 27.7962L26.3586 34.2613L24.0816 36.3328C27.5115 28.4899 24.7525 25.9831 24.7525 25.9831C14.3142 27.5489 15.8053 38.1364 15.8053 38.1364L16.7 40.8951L15.5342 44.0367V27.6686L27.2805 23.9189V23.9191Z" fill="#BAB6C1"/>
+      <path d="M19.728 10.8423L19.0961 20.2575L18.2041 21.8647L27.345 18.4874C27.345 18.4874 26.7475 14.0584 19.728 10.8423Z" fill="#EFEFF0"/>
+      <path d="M18.2041 21.8642L19.0961 20.257L19.728 10.8418C20.5038 11.1973 21.197 11.568 21.8238 11.9456L21.3915 19.673L18.2041 21.8642Z" fill="#BAB6C1"/>
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M15.5342 25.8468L28.2309 19.2964L15.5342 23.7623V25.8468Z" fill="#D2CFD7"/>
+      <path d="M23.2704 28.7852C21.3805 29.0504 19.0637 30.6828 17.9473 33.246C19.9511 33.6484 23.2821 31.3292 23.2704 28.7852Z" fill="#FF5733"/>
+      <path d="M7.45804 28.7852C9.34797 29.0504 11.6648 30.6828 12.7812 33.246C10.7774 33.6484 7.44639 31.3292 7.45804 28.7852Z" fill="#FF5733"/>
+    </g>
+    <defs>
+      <linearGradient id="bmg0" x1="101.631" y1="-1.54014" x2="101.631" y2="56.7664" gradientUnits="userSpaceOnUse">
+        <stop stop-color="white"/><stop offset="0.439216" stop-color="#FEFEFE"/><stop offset="0.509804" stop-color="#FEFEFE"/>
+        <stop offset="0.521569" stop-color="#E1E0E7"/><stop offset="0.678431" stop-color="#EFEEF2"/>
+        <stop offset="0.921569" stop-color="#FEFEFE"/><stop offset="1" stop-color="#FEFEFE"/>
+      </linearGradient>
+      <linearGradient id="bmg1" x1="7.24352" y1="49.1976" x2="10.6526" y2="32.4219" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#FFA700"/><stop offset="0.541176" stop-color="#FF3F00"/><stop offset="1" stop-color="#A30300"/>
+      </linearGradient>
+      <clipPath id="bmc0"><rect width="124.832" height="38.8799" fill="white" transform="translate(39.1689 15.7754)"/></clipPath>
+      <clipPath id="bmc1"><rect width="31.0676" height="54.582" fill="white"/></clipPath>
+    </defs>
+  </symbol>
+</svg>
+
+<!-- ============================ MASTHEAD ============================ -->
+<header class="masthead">
+  <div class="wrap">
+    <a class="logo-link" href="#top" aria-label="Boadman, home">
+      <svg class="logo" viewBox="0 0 164 55" role="img" aria-hidden="true" focusable="false"><use href="#bmLogo"/></svg>
+    </a>
+    <nav class="mast-nav" aria-label="Primary">
+      <a href="#board">The board</a>
+      <a href="#hold">The hold</a>
+      <a href="#signatures">Brands and publishers</a>
+      <a href="/faqs">FAQs</a>
+      <a href="/signin">Sign in</a>
+      <span class="age-chip">18+</span>
+      <a class="btn btn-fill" href="/signup">Create account</a>
+    </nav>
+    <button class="burger" type="button" id="burger" aria-expanded="false" aria-controls="sheet">Menu</button>
+  </div>
+</header>
+
+<div class="sheet" id="sheet" data-open="false" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="sheet-top">
+    <svg class="logo" viewBox="0 0 164 55" role="img" aria-hidden="true" focusable="false"><use href="#bmLogo"/></svg>
+    <button class="burger" type="button" id="sheetClose" style="display:inline-block">Close</button>
+  </div>
+  <nav aria-label="Menu">
+    <a class="sheet-item" href="#board">The board</a>
+    <a class="sheet-item" href="#hold">The hold</a>
+    <a class="sheet-item" href="#signatures">Brands and publishers</a>
+    <a class="sheet-item" href="/faqs">FAQs</a>
+    <a class="sheet-item" href="/signin">Sign in</a>
+    <a class="sheet-item" href="/signup" style="color:var(--verm)">Create account</a>
+  </nav>
+  <div class="sheet-foot">
+    <p class="label" style="color:var(--verm);margin-bottom:10px">18+ only</p>
+    <p class="body-sm mute-ink" style="margin:0">Coins are bought with real money. A stake is lost when you lose, and commission is deducted on every settlement.</p>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ============================ 01 · COVER ============================ -->
+<section class="world w-ink" id="top" aria-labelledby="cover-h">
+  <div class="wrap cover">
+
+    <div class="cover-rule">
+      <p class="label">Boadman <b>·</b> Competition platform for video game players <b>·</b> <span class="hot">18+ only</span></p>
+      <p class="label">Coins <b>·</b> 1v1 challenges <b>·</b> Tournaments</p>
+    </div>
+
+    <h1 class="poster" id="cover-h">
+      <span class="l1">The match</span>
+      <span class="cover-tail"><span class="l2">decides.</span><span class="kicker">who takes the pot, and who does not</span></span>
+    </h1>
+
+    <div class="cover-row">
+      <p class="body">Buy coins. Stake them in a 1v1 challenge or a tournament. Play the match in the game itself. Boadman does not run the game: it holds both stakes while you play, records the result, and pays the winner at settlement.</p>
+      <div class="cover-cta">
+        <a class="btn btn-fill" href="/signup">Create an account</a>
+        <a class="btn btn-ghost" href="/signin">Sign in</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bleed cover-plate">
+    <img src="../genre/roster-competitors.jpg" alt="Five competitors in matching team jackets and headsets, lit from behind." width="1568" height="659">
+  </div>
+</section>
+
+<!-- ---- cost and risk, one block, one type size ---- -->
+<section class="world w-ink cost-strip" aria-labelledby="cost-h">
+  <div class="wrap">
+    <div class="plate-cap">
+      <p class="label">Plate 01 <b>·</b> Original creative produced for Boadman</p>
+      <p class="label">No game title, artwork or logo appears anywhere on this page</p>
+    </div>
+    <h2 class="label" id="cost-h" style="color:var(--verm);border-top:2px solid var(--hair-bone);padding-top:22px;margin:26px 0 22px">What a coin costs, and what it risks</h2>
+    <div class="cost-grid">
+      <div>
+        <p class="label" style="color:var(--mute-on-ink)">The cost</p>
+        <p>Coins are bought with real money at the current rate, 1 coin = 10p, shown before you pay.</p>
+      </div>
+      <div>
+        <p class="label" style="color:var(--mute-on-ink)">The risk</p>
+        <p><strong>A stake is lost when you lose.</strong> It pays the winner and is not returned. Commission is deducted from the pot on every settlement.</p>
+      </div>
+      <div>
+        <p class="label" style="color:var(--mute-on-ink)">The conditions</p>
+        <p>18+ only. Cash out goes to a bank account in the same legal name as your account.</p>
+        <a class="tlink" href="/legal/terms">Read the Terms</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 02 · COUNTER BAND ============================ -->
+<section class="world w-verm" aria-labelledby="counters-h">
+  <div class="wrap band">
+    <div class="band-head">
+      <h2 class="poster h-half" id="counters-h">The public counters</h2>
+      <p class="label">Sample figures <b>·</b> not live</p>
+    </div>
+
+    <div class="counters">
+      <div class="counter"><span class="num">24</span><p class="label">Tournaments live</p></div>
+      <div class="counter"><span class="num">&pound;12.4k</span><p class="label">Prizes paid <b>·</b> 30 days</p></div>
+      <div class="counter"><span class="num">3.8k</span><p class="label">Active players <b>·</b> 30 days</p></div>
+      <div class="counter"><span class="num">6</span><p class="label">Supported games</p></div>
+    </div>
+
+    <p class="band-note">The figures above are sample values shown for layout. On the platform this block renders live counters, printed literally up to 999 and compacted above it. If the counters cannot be read, the block is removed from the page rather than filled with zeros. Prizes paid is a record of settlements that have already happened, not a forecast, and a stake is lost when you lose.</p>
+  </div>
+</section>
+
+<!-- ============================ 03 · TWO PLAYERS, ONE POT ============================ -->
+<section class="world w-ink" aria-labelledby="path-h">
+  <div class="bleed plate-wide">
+    <img src="../genre/genre-fps.jpg" alt="Two armoured competitors squared up across a rain soaked arena floor." width="1568" height="659">
+  </div>
+</section>
+
+<section class="world w-kraft" aria-labelledby="path-h2">
+  <div class="wrap sec">
+    <div class="sec-split">
+      <div class="sec-head">
+        <span class="folio">01</span>
+        <h2 class="poster h-col" id="path-h2">
+          <span>Two players.</span><span>One pot.</span>
+        </h2>
+        <p class="kicker mute-kraft">Five steps, and none of them are hidden from you.</p>
+        <p class="body-sm mute-kraft" style="margin-top:22px">The same five steps run a 64 player tournament and a single 1v1 challenge. The only thing that changes is how many stakes go into the pot.</p>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <span class="sn">01</span>
+          <div>
+            <h3>Buy coins</h3>
+            <p>Coins are bought by card at the current rate, 1 coin = 10p, and land in your wallet. They are bought with real money.</p>
+          </div>
+        </li>
+        <li>
+          <span class="sn">02</span>
+          <div>
+            <h3>Enter, and the stake leaves</h3>
+            <p>Entering a competition moves the stake out of your wallet immediately. A tournament with an entry fee of exactly 0 coins takes nothing.</p>
+          </div>
+        </li>
+        <li>
+          <span class="sn">03</span>
+          <div>
+            <h3>Play the match</h3>
+            <p>The match is played in the game itself. Boadman holds both stakes from the start of play until settlement. Neither side can spend, withdraw or re-stake them while the match runs.</p>
+          </div>
+        </li>
+        <li>
+          <span class="sn">04</span>
+          <div>
+            <h3>Settle</h3>
+            <p>The pot pays the winner, minus platform commission. The losing stake pays the winner and is not returned. The commission rate in force is shown before you enter.</p>
+          </div>
+        </li>
+        <li>
+          <span class="sn">05</span>
+          <div>
+            <h3>Hold, then cash out</h3>
+            <p>A prize is held for 48 hours before it can be spent, then matures on its own. Cash out goes only to a bank account in the same legal name as your Boadman account.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="sec-foot">
+      <p class="body-sm mute-kraft" style="margin:0">Identity checks are required before a first cash out, and again at higher amounts.</p>
+      <a class="tlink" href="/legal/terms">Stakes, commission and payouts in the Terms</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 04 · THE BOARD ============================ -->
+<section class="world w-bone" id="board" aria-labelledby="board-h" style="scroll-margin-top:80px">
+  <div class="wrap sec">
+
+    <div class="board-head">
+      <div class="sec-head">
+        <span class="folio">02</span>
+        <h2 class="poster h-full" id="board-h">The board</h2>
+      </div>
+      <p class="kicker mute-bone">Open competitions, the amount in the pot, and the price of walking in.</p>
+    </div>
+
+    <div class="sample-strip">
+      <span class="sample-tag">Sample data</span>
+      <p>These four competitions are illustrative and are not live. Host is shown by type only, never by name. Genre is shown in place of a title: game titles appear here once a publisher licenses them, and today the platform holds rights to no game.</p>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filter competitions by state">
+      <button type="button" data-filter="all" aria-pressed="true">All four</button>
+      <button type="button" data-filter="live" aria-pressed="false">Live</button>
+      <button type="button" data-filter="open" aria-pressed="false">Open</button>
+      <button type="button" data-filter="soon" aria-pressed="false">Starting soon</button>
+    </div>
+    <p class="count-live mute-bone" id="boardCount" role="status" aria-live="polite">Showing all 4 sample competitions.</p>
+
+    <div class="cards" style="margin-top:22px" id="cards">
+
+      <article class="card" data-state="live">
+        <div class="card-img">
+          <img src="../genre/genre-fighting.jpg" alt="Two martial competitors mid clash in a floodlit arena." width="1376" height="768">
+          <div class="card-chips"><span class="chip chip-live">Live</span><span class="chip chip-sample">Sample</span></div>
+        </div>
+        <div class="card-body">
+          <h3>Friday night ladder</h3>
+          <p class="card-meta">Genre: Fighting <b>·</b> Host type: Platform</p>
+          <div class="pool">
+            <p class="label">Prize pool</p>
+            <span class="num">26,000<span class="unit">coins</span></span>
+          </div>
+          <div class="figs">
+            <div class="fig"><p class="label">Host put up</p><span class="v">5,000 coins</span></div>
+            <div class="fig"><p class="label">Entry</p><span class="v">250 coins</span></div>
+            <div class="fig"><p class="label">Entrants</p><span class="v">84 / 128</span></div>
+          </div>
+          <div class="card-cta"><a class="tlink" href="/p/tournament/sample-ladder">View competition</a></div>
+        </div>
+      </article>
+
+      <article class="card" data-state="soon">
+        <div class="card-img">
+          <img src="../genre/genre-racing.jpg" alt="A racing car cornering on a wet neon lit city street." width="1376" height="768">
+          <div class="card-chips"><span class="chip chip-soon">Starting soon</span><span class="chip chip-sample">Sample</span></div>
+        </div>
+        <div class="card-body">
+          <h3>Wet circuit open</h3>
+          <p class="card-meta">Genre: Racing <b>·</b> Host type: Brand</p>
+          <div class="pool">
+            <p class="label">Prize pool</p>
+            <span class="num">1,250,000<span class="unit">coins</span></span>
+          </div>
+          <div class="figs">
+            <div class="fig"><p class="label">Host put up</p><span class="v">1,250,000 coins</span></div>
+            <div class="fig"><p class="label">Entry</p><span class="v">Free entry</span></div>
+            <div class="fig"><p class="label">Entrants</p><span class="v">348 / 512</span></div>
+          </div>
+          <div class="card-cta"><a class="tlink" href="/p/tournament/sample-circuit">View competition</a></div>
+        </div>
+      </article>
+
+      <article class="card" data-state="open">
+        <div class="card-img">
+          <img src="../genre/genre-chess.jpg" alt="A spotlit knight on a chess board with a seated audience behind." width="1376" height="768">
+          <div class="card-chips"><span class="chip chip-open">Open</span><span class="chip chip-sample">Sample</span></div>
+        </div>
+        <div class="card-body">
+          <h3>Nightly gambit</h3>
+          <p class="card-meta">Genre: Chess <b>·</b> Host type: Player</p>
+          <div class="pool">
+            <p class="label">Prize pool</p>
+            <span class="num">3,600<span class="unit">coins</span></span>
+          </div>
+          <div class="figs">
+            <div class="fig"><p class="label">Host put up</p><span class="v">1,000 coins</span></div>
+            <div class="fig"><p class="label">Entry</p><span class="v">100 coins</span></div>
+            <div class="fig"><p class="label">Entrants</p><span class="v">26 / 64</span></div>
+          </div>
+          <div class="card-cta"><a class="tlink" href="/p/tournament/sample-gambit">View competition</a></div>
+        </div>
+      </article>
+
+      <article class="card" data-state="open">
+        <div class="card-img">
+          <img src="../genre/genre-strategy.jpg" alt="A commander in silhouette beside a glowing tactical map table." width="1376" height="768">
+          <div class="card-chips"><span class="chip chip-open">Open</span><span class="chip chip-sample">Sample</span></div>
+        </div>
+        <div class="card-body">
+          <h3>Command table invitational</h3>
+          <p class="card-meta">Genre: Strategy <b>·</b> Host type: Platform</p>
+          <div class="pool">
+            <p class="label">Prize pool</p>
+            <span class="num">19,000<span class="unit">coins</span></span>
+          </div>
+          <div class="figs">
+            <div class="fig"><p class="label">Host put up</p><span class="v">10,000 coins</span></div>
+            <div class="fig"><p class="label">Entry</p><span class="v">1,000 coins</span></div>
+            <div class="fig"><p class="label">Entrants</p><span class="v">9 / 32</span></div>
+          </div>
+          <div class="card-cta"><a class="tlink" href="/p/tournament/sample-command">View competition</a></div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="board-foot">
+      <p class="body-sm mute-bone" style="margin:0">A stake is lost when you lose: it pays the winner and is not returned. A prize can be frozen while a complaint is heard, and reversed if the complaint succeeds. Commission is deducted from the pot on every settlement, at the rate shown before you enter.</p>
+      <p style="margin:0"><a class="tlink" href="/legal/terms">Terms</a></p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================ MARQUEE RULE ============================ -->
+<section class="world w-ink" aria-hidden="true">
+  <div class="marq">
+    <div class="marq-track">
+      <span>Buy <em>/</em> Stake <em>/</em> Play <em>/</em> Settle <em>/</em> Hold <em>/</em> Cash out <em>/</em>&nbsp;</span>
+      <span>Buy <em>/</em> Stake <em>/</em> Play <em>/</em> Settle <em>/</em> Hold <em>/</em> Cash out <em>/</em>&nbsp;</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 05 · THE HOLD ============================ -->
+<section class="world w-oxblood" id="hold" aria-labelledby="hold-h" style="scroll-margin-top:80px">
+  <div class="wrap sec">
+    <div class="hold-head">
+      <span class="folio" style="color:var(--verm-lift)">03</span>
+      <h2 class="poster h-full" id="hold-h"><span>48 hours</span><span class="l2">before it is yours.</span></h2>
+      <p class="kicker mute-ox" style="margin-top:20px;max-width:34ch">A prize exists before it can be spent. Both halves of that sentence are printed at the same size below.</p>
+    </div>
+
+    <div class="balance">
+      <div>
+        <h3>What the hold does</h3>
+        <ul>
+          <li>At settlement the pot pays the winner, minus platform commission.</li>
+          <li>The prize is then held for 48 hours before it can be spent, so other entrants have a window in which to raise a complaint about cheating.</li>
+          <li>It matures automatically when the window closes. Nobody has to release it by hand.</li>
+          <li>From the start of a match until it settles, neither side can spend, withdraw or re-stake the pot.</li>
+          <li>The same 48 hour hold runs on a player hosted tournament prize and on a 1v1 challenge prize.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>What can stop the money</h3>
+        <ul>
+          <li>Losing. A lost stake pays the winner and is not returned.</li>
+          <li>A complaint raised inside the 48 hour window freezes the prize until an admin rules on it.</li>
+          <li>A dispute ruled frivolous carries a fee, deducted from the person who filed it.</li>
+          <li>A money laundering review can freeze a cash out while it runs.</li>
+          <li>A bank account whose name does not match the account holder does not get paid. Identity checks are required before a first cash out, and again at higher amounts.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sec-foot">
+      <p class="body-sm mute-ox" style="margin:0">Boadman does not run the game. It holds the pot, records the result and rules on complaints.</p>
+      <a class="tlink" href="/legal/terms">Holds, disputes and commission in the Terms</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 06 · THREE SIGNATURES ============================ -->
+<section class="world w-ink" id="signatures" aria-labelledby="sig-h" style="scroll-margin-top:80px">
+  <div class="sig">
+    <div class="sig-img">
+      <img src="../genre/genre-strategy.jpg" alt="A commander in silhouette studying a glowing tactical map table." width="1376" height="768">
+    </div>
+    <div class="sig-body">
+      <span class="folio" style="color:var(--verm)">04</span>
+      <h2 class="poster h-half" id="sig-h"><span>No competition</span><span>exists without</span><span class="l2">three signatures.</span></h2>
+      <p class="body mute-ink" style="margin-top:22px">A player to stake. A brand or a host to put something in the pot. A publisher to license the title it is played in. Take any one away and there is nothing to enter.</p>
+
+      <div class="ledger">
+        <div class="ledger-item lead">
+          <span class="n">01</span>
+          <div>
+            <h3>The player</h3>
+            <p>Buys coins, stakes them, and takes the pot when the match goes their way. 18+. Cash out goes only to a bank account in your own legal name, and a lost stake is not returned.</p>
+            <a class="tlink" href="/signup">Create an account</a>
+          </div>
+        </div>
+        <div class="ledger-item">
+          <span class="n">02</span>
+          <div>
+            <h3>The brand</h3>
+            <p>Funds prize pools to put a competition in front of players. A brand account is blocked from moving any value at all until business verification passes. There is no bypass and no provisional route.</p>
+            <a class="tlink" href="/signup-brand">Open a brand account</a>
+          </div>
+        </div>
+        <div class="ledger-item">
+          <span class="n">03</span>
+          <div>
+            <h3>The publisher</h3>
+            <p>Licenses a title to the platform and takes a royalty share of platform commission. This is the only mechanism by which competitions on a game can exist. No publisher has onboarded yet, so the platform holds rights to no game today, and the waitlist is the only door open.</p>
+            <a class="tlink" href="/waitlist/publishers">Join the publisher waitlist</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-foot">
+        <p class="body-sm mute-ink" style="margin:0">Commission is deducted on every settlement. Royalty share is a share of that commission, not of the pot.</p>
+        <a class="tlink" href="/legal/terms">Terms</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 07 · RESPONSIBLE PLAY ============================ -->
+<section class="world w-bone" aria-labelledby="rp-h">
+  <div class="wrap sec">
+    <div class="rp">
+      <div class="sec-head">
+        <span class="folio">05</span>
+        <h2 class="poster h-col" id="rp-h"><span>If it stops</span><span>being a game.</span></h2>
+        <p class="kicker mute-bone" style="margin-top:20px;max-width:28ch">Independent help exists, and it is not us.</p>
+        <p class="body mute-bone" style="margin-top:22px">Boadman does not currently offer deposit limits, loss limits, session reminders, reality checks, cooling off timers or self exclusion. If you want an account suspended, the route today is to email us and ask.</p>
+        <p style="margin-top:6px"><a class="tlink" href="/legal/responsible-play">Responsible play</a></p>
+      </div>
+
+      <div class="rp-card">
+        <p class="label">Free, confidential and independent</p>
+        <p class="rp-org">GamCare</p>
+        <ul class="rp-lines">
+          <li>National Gambling Helpline <a class="inline-link" href="tel:08088020133">0808 8020 133</a></li>
+          <li><a class="inline-link" href="https://www.gamcare.org.uk" rel="noopener noreferrer" target="_blank">gamcare.org.uk</a></li>
+          <li>Account suspension requests <a class="inline-link" href="mailto:compliance@boadman.com">compliance@boadman.com</a></li>
+          <li>Anything else <a class="inline-link" href="mailto:support@boadman.com">support@boadman.com</a></li>
+        </ul>
+        <p class="body-sm mute-bone" style="margin:0">18+ only. Only stake coins you are prepared to lose: a lost stake pays the winner and is not returned.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================ COLOPHON ============================ -->
+<footer class="world w-ink">
+  <div class="wrap colophon">
+    <div class="colo-top">
+      <div class="colo-col colo-brand">
+        <svg class="logo" viewBox="0 0 164 55" role="img" aria-label="Boadman"><use href="#bmLogo"/></svg>
+        <p class="body-sm mute-ink" style="max-width:34ch">A competition platform for video game players. Coins in, one winner, commission out.</p>
+        <p style="margin-top:16px"><span class="age-chip">18+ only</span></p>
+      </div>
+      <div class="colo-col">
+        <h3>Play</h3>
+        <ul>
+          <li><a href="/signup">Create an account</a></li>
+          <li><a href="/signin">Sign in</a></li>
+          <li><a href="/faqs">FAQs</a></li>
+        </ul>
+      </div>
+      <div class="colo-col">
+        <h3>Partner</h3>
+        <ul>
+          <li><a href="/signup-brand">Brands and sponsors</a></li>
+          <li><a href="/waitlist/publishers">Publisher waitlist</a></li>
+        </ul>
+      </div>
+      <div class="colo-col">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="/legal/terms">Terms</a></li>
+          <li><a href="/legal/privacy">Privacy</a></li>
+          <li><a href="/legal/cookies">Cookies</a></li>
+          <li><a href="/legal/responsible-play">Responsible play</a></li>
+        </ul>
+      </div>
+      <div class="colo-col">
+        <h3>Contact</h3>
+        <ul>
+          <li><a href="mailto:support@boadman.com">support@boadman.com</a></li>
+          <li><a href="mailto:compliance@boadman.com">compliance@boadman.com</a></li>
+          <li><a href="tel:08088020133">GamCare 0808 8020 133</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="colo-bottom">
+      <p><strong style="color:var(--bone)">18+ only.</strong> Coins are bought with real money at the current rate, 1 coin = 10p. A stake is lost when you lose and is not returned. A prize is held for 48 hours and can be frozen or reversed while a complaint is heard. Commission is deducted on every settlement. Every competition shown on this page is sample data, and every image is an original creative produced for Boadman: no game title, artwork or logo appears anywhere on it.</p>
+      <span class="age-chip">18+</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var doc = document.documentElement;
+  doc.classList.add('js');
+
+  /* ---- mobile sheet ---- */
+  var burger = document.getElementById('burger');
+  var sheet = document.getElementById('sheet');
+  var sheetClose = document.getElementById('sheetClose');
+  var lastFocus = null;
+
+  function openSheet() {
+    lastFocus = document.activeElement;
+    sheet.setAttribute('data-open', 'true');
+    burger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    sheetClose.focus();
+  }
+  function closeSheet() {
+    sheet.setAttribute('data-open', 'false');
+    burger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    if (lastFocus) { lastFocus.focus(); }
+  }
+  burger.addEventListener('click', function () {
+    if (sheet.getAttribute('data-open') === 'true') { closeSheet(); } else { openSheet(); }
+  });
+  sheetClose.addEventListener('click', closeSheet);
+  sheet.addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') { closeSheet(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheet.getAttribute('data-open') === 'true') { closeSheet(); }
+  });
+
+  /* ---- board filter ---- */
+  var buttons = [].slice.call(document.querySelectorAll('.filters button'));
+  var cards = [].slice.call(document.querySelectorAll('#cards .card'));
+  var readout = document.getElementById('boardCount');
+  var names = { all: 'all', live: 'live', open: 'open', soon: 'starting soon' };
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var want = btn.getAttribute('data-filter');
+      buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+      var shown = 0;
+      cards.forEach(function (card) {
+        var match = (want === 'all') || (card.getAttribute('data-state') === want);
+        card.hidden = !match;
+        card.style.display = match ? '' : 'none';
+        if (match) { shown += 1; }
+      });
+      readout.textContent = want === 'all'
+        ? 'Showing all ' + shown + ' sample competitions.'
+        : 'Showing ' + shown + ' ' + names[want] + ' sample ' + (shown === 1 ? 'competition' : 'competitions') + '.';
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
